@@ -2,8 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./map.css";
-import images from '../location-dot-duotone (1).png'
-
+import images from "../location-dot-duotone (1).png";
 
 export default function Map() {
   //   const mapContainer = useRef(null);
@@ -27,15 +26,21 @@ export default function Map() {
             type: "Feature",
             geometry: {
               type: "Point",
-              coordinates: [
-                jsonData[i].lng,
-                jsonData[i].lat,
-              ],
+              coordinates: [jsonData[i].lng, jsonData[i].lat],
             },
-            properties: {},
+            properties: {
+              parkID: jsonData[i].parkID,
+              parkName: jsonData[i].parkName,
+              capacity: jsonData[i].capacity,
+              workHours: jsonData[i].workHours,
+              parkType: jsonData[i].parkType,
+              freeTime: jsonData[i].freeTime,
+              district: jsonData[i].district,
+            },
           });
         }
-        setData(geojsonData);
+
+        setData(geojsonData); //geojsonData'ya veriler eklendi. Ve state'ddeki durumu değişti
 
         console.log(geojsonData);
       });
@@ -46,7 +51,8 @@ export default function Map() {
     const map = new maplibregl.Map({
       //   container: mapContainer.current,
       container: "map",
-      style: "https://demotiles.maplibre.org/style.json",
+      style:
+        "https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json",
       center: [lng, lat],
       zoom: zoom,
     });
@@ -55,29 +61,104 @@ export default function Map() {
     // -----geojsonı haritada gösterme-------
     map.on("load", () => {
       // Add an image to use as a custom marker
-      map.loadImage(
-        images,
-        (error, image) => {
-          if (error) throw error;
-          map.addImage("custom-marker", image);
+      map.loadImage(images, (error, image) => {
+        if (error) throw error;
+        map.addImage("custom-marker", image);
 
-          map.addSource("sa", {
-            type: "geojson",
-            data: data,
-          });
+        map.addSource("places", {
+          type: "geojson",
+          data: data,
+        });
 
-          // Add a symbol layer
-          map.addLayer({
-            id: "saas",
-            type: "symbol",
-            source: "sa",
-            size:'24px',
-            layout: {
-              "icon-image": "custom-marker",
-            },
-          });
-        }
-      );
+        // Add a symbol layer
+        map.addLayer({
+          id: "places",
+          type: "symbol",
+          source: "places",
+          size: "24px",
+          layout: {
+            "icon-image": "custom-marker",
+          },
+        });
+      });
+    });
+
+    map.on("click", "places", (e) => {
+
+      const coordinates = e.features[0].geometry.coordinates.slice();
+      const parkID = e.features[0].properties.parkID;
+      const parkName = e.features[0].properties.parkName;
+      const capacity = e.features[0].properties.capacity;
+      const workHours = e.features[0].properties.workHours;
+      const parkType = e.features[0].properties.parkType;
+      const freeTime = e.features[0].properties.freeTime;
+      const district = e.features[0].properties.district;
+
+      // Ensure that if the map is zoomed out such that multiple
+      // copies of the feature are visible, the popup appears
+      // over the copy being pointed to.
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+
+     
+
+      let popup =new maplibregl.Popup()
+        .setLngLat(coordinates)
+        .setHTML(
+          "<b>Park ID: </b>" +
+            parkID +
+            "<br>" +
+            "<b>Park Adı: </b>" +
+            parkName +
+            "<br>" +
+            "<b>Kapasite: </b>" +
+            capacity +
+            "<br>" +
+            "<b>Çalışma Saatleri: </b>" +
+            workHours +
+            "<br>" +
+            "<b>Park Tipi: </b>" +
+            parkType +
+            "<br>" +
+            "<b>Ücretsiz Park Süresi: </b>" +
+            freeTime +
+            " dk" +
+            "<br>" +
+            "<b>İlçe: </b>" +
+            district
+        )
+        .addTo(map);
+
+
+        map.on('zoomend', function () {
+          var currentZoom = map.getZoom();
+          
+          
+          if (currentZoom <= 10) {
+            popup.remove(); // Pop-up'ı kapat
+          }
+        });
+
+    });
+    
+
+    
+    map.on("click", "places", (e) => {
+      map.flyTo({
+        center: e.features[0].geometry.coordinates,
+        zoom: 15,
+      });
+    });
+
+    // mous bir noktaya geldiğinde ve ayrıldığında cursor değişimleri
+    map.on("mouseenter", "places", () => {
+      map.getCanvas().style.cursor = "pointer";
+    });
+
+    
+    map.on("mouseleave", "places", () => {
+      map.getCanvas().style.cursor = "";
     });
   }, [data]);
   return (
