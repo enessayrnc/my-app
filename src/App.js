@@ -9,6 +9,7 @@ import ListBox from "./components/listBox";
 
 function App() {
   const [items, setItems] = useState([]);
+  const [map, setMap] = useState([]);
 
 
   
@@ -16,9 +17,8 @@ function App() {
     
 
     <div className="App">
-    {/* <Navbar></Navbar> */}
-    <Map propsMap={setItems}></Map>
-    <ListBox propsListbox={items} berkay= 'berkay'></ListBox>
+    <Map propsMap={setItems} clickMap = {setMap}></Map>
+    <ListBox propsListbox={items} getclickMap= {map}></ListBox>
     
    
 

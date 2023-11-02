@@ -57,6 +57,7 @@ export default function Map(props) {
       center: [lng, lat],
       zoom: zoom,
     });
+    props.clickMap(map)
     map.addControl(new maplibregl.NavigationControl());
 
     // -----geojsonı haritada gösterme-------
