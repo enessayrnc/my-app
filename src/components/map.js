@@ -4,20 +4,21 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "./map.css";
 import images from "../location-dot-duotone (1).png";
 
-export default function Map() {
+export default function Map(props) {
   //   const mapContainer = useRef(null);
   const mapContainer = useRef(null);
   const [lng] = useState(29.068335);
   const [lat] = useState(41.110069);
   const [zoom] = useState(7.6);
   const [data, setData] = useState();
+  
 
   //veriye istek atma
   useEffect(() => {
     fetch("https://api.ibb.gov.tr/ispark/Park")
       .then((response) => response.json())
       .then((jsonData) => {
-        console.log(jsonData);
+        // console.log(jsonData);
 
         //json verisini geojson'a manipüle etme
         let geojsonData = { type: "FeatureCollection", features: [] };
@@ -78,13 +79,14 @@ export default function Map() {
           size: "24px",
           layout: {
             "icon-image": "custom-marker",
+            "icon-allow-overlap": true,
+            "icon-anchor": "top",
           },
         });
       });
     });
 
     map.on("click", "places", (e) => {
-
       const coordinates = e.features[0].geometry.coordinates.slice();
       const parkID = e.features[0].properties.parkID;
       const parkName = e.features[0].properties.parkName;
@@ -101,9 +103,7 @@ export default function Map() {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
 
-     
-
-      let popup =new maplibregl.Popup()
+      let popup = new maplibregl.Popup()
         .setLngLat(coordinates)
         .setHTML(
           "<b>Park ID: </b>" +
@@ -130,20 +130,15 @@ export default function Map() {
         )
         .addTo(map);
 
+      map.on("zoomend", function () {
+        var currentZoom = map.getZoom();
 
-        map.on('zoomend', function () {
-          var currentZoom = map.getZoom();
-          
-          
-          if (currentZoom <= 10) {
-            popup.remove(); // Pop-up'ı kapat
-          }
-        });
-
+        if (currentZoom <= 10) {
+          popup.remove(); // Pop-up'ı kapat
+        }
+      });
     });
-    
-
-    
+    //noktaya tıklandığında haritanın merkezine orayı alarak zoom seviyesini 15 yapar
     map.on("click", "places", (e) => {
       map.flyTo({
         center: e.features[0].geometry.coordinates,
@@ -151,15 +146,33 @@ export default function Map() {
       });
     });
 
-    // mous bir noktaya geldiğinde ve ayrıldığında cursor değişimleri
+    // mouse bir noktaya geldiğinde ve ayrıldığında cursor değişimleri
     map.on("mouseenter", "places", () => {
       map.getCanvas().style.cursor = "pointer";
     });
 
-    
     map.on("mouseleave", "places", () => {
       map.getCanvas().style.cursor = "";
     });
+
+    // Render edilen feature sayısı 
+    map.on("moveend", "places", (e) => {
+      const features = map.queryRenderedFeatures(e.features[0], {
+        layers: ["places"],
+      });
+      
+
+      props.propsMap(features)
+      // console.log(features); 
+      // for (var i = 0; i < features.length; i++) {
+      //   console.log(features[i].properties.parkName);
+      // }
+      // console.log(features.length); //ispark sayısı
+    });
+
+
+
+    
   }, [data]);
   return (
     <div className="map-wrap">

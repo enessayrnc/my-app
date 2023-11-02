@@ -1,19 +1,25 @@
-import React from "react";
+import React,{useState} from "react";
 import './App.css'
-import Navbar from './components/navbar.js';
 import Map from "./components/map";
-
+import ListBox from "./components/listBox";
 
 
 
 
 
 function App() {
+  const [items, setItems] = useState([]);
+
+
   
   return (
+    
+
     <div className="App">
     {/* <Navbar></Navbar> */}
-    <Map></Map>
+    <Map propsMap={setItems}></Map>
+    <ListBox propsListbox={items} berkay= 'berkay'></ListBox>
+    
    
 
 
