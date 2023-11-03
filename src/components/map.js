@@ -62,6 +62,7 @@ export default function Map(props) {
 
     // -----geojsonı haritada gösterme-------
     map.on("load", () => {
+      
       // Add an image to use as a custom marker
       map.loadImage(images, (error, image) => {
         if (error) throw error;
@@ -155,6 +156,8 @@ export default function Map(props) {
     map.on("mouseleave", "places", () => {
       map.getCanvas().style.cursor = "";
     });
+
+    
 
     // Render edilen feature sayısı 
     map.on("moveend", "places", (e) => {
