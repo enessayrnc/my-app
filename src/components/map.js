@@ -3,6 +3,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./map.css";
 import images from "../location-dot-duotone (1).png";
+import reactDom from "react-dom";
 
 export default function Map(props) {
   //   const mapContainer = useRef(null);
@@ -11,7 +12,9 @@ export default function Map(props) {
   const [lat] = useState(41.110069);
   const [zoom] = useState(7.6);
   const [data, setData] = useState();
-  
+  const [elem, setElem] = useState();
+
+  const [items, setItems] = useState([]);
 
   //veriye istek atma
   useEffect(() => {
@@ -43,7 +46,7 @@ export default function Map(props) {
 
         setData(geojsonData); //geojsonData'ya veriler eklendi. Ve state'ddeki durumu değişti
 
-        console.log(geojsonData);
+        // console.log(geojsonData);
       });
   }, []);
   useEffect(() => {
@@ -57,12 +60,11 @@ export default function Map(props) {
       center: [lng, lat],
       zoom: zoom,
     });
-    props.clickMap(map)
+    props.clickMap(map);
     map.addControl(new maplibregl.NavigationControl());
 
     // -----geojsonı haritada gösterme-------
     map.on("load", () => {
-      
       // Add an image to use as a custom marker
       map.loadImage(images, (error, image) => {
         if (error) throw error;
@@ -105,31 +107,40 @@ export default function Map(props) {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
 
+      const popupDiv = document.createElement("div");
+      reactDom.render(
+        <PopupTest popup={e.features[0].properties} setItems={setItems} />,
+        popupDiv
+      );
+
       let popup = new maplibregl.Popup()
         .setLngLat(coordinates)
-        .setHTML(
-          "<b>Park ID: </b>" +
-            parkID +
-            "<br>" +
-            "<b>Park Adı: </b>" +
-            parkName +
-            "<br>" +
-            "<b>Kapasite: </b>" +
-            capacity +
-            "<br>" +
-            "<b>Çalışma Saatleri: </b>" +
-            workHours +
-            "<br>" +
-            "<b>Park Tipi: </b>" +
-            parkType +
-            "<br>" +
-            "<b>Ücretsiz Park Süresi: </b>" +
-            freeTime +
-            " dk" +
-            "<br>" +
-            "<b>İlçe: </b>" +
-            district
-        )
+        .setDOMContent(popupDiv)
+        // .setHTML(
+        //   "<b>Park ID: </b>" +
+        //     parkID +
+        //     "<br>" +
+        //     "<b>Park Adı: </b>" +
+        //     parkName +
+        //     "<br>" +
+        //     "<b>Kapasite: </b>" +
+        //     capacity +
+        //     "<br>" +
+        //     "<b>Çalışma Saatleri: </b>" +
+        //     workHours +
+        //     "<br>" +
+        //     "<b>Park Tipi: </b>" +
+        //     parkType +
+        //     "<br>" +
+        //     "<b>Ücretsiz Park Süresi: </b>" +
+        //     freeTime +
+        //     " dk" +
+        //     "<br>" +
+        //     "<b>İlçe: </b>" +
+        //     district +
+        //     "<br>" +
+        //     `<button className='button1' onClick="()=>enes()">KAYDET</button>`
+        // )
         .addTo(map);
 
       map.on("zoomend", function () {
@@ -157,30 +168,59 @@ export default function Map(props) {
       map.getCanvas().style.cursor = "";
     });
 
-    
-
-    // Render edilen feature sayısı 
+    // Render edilen feature sayısı
     map.on("moveend", "places", (e) => {
       const features = map.queryRenderedFeatures(e.features[0], {
         layers: ["places"],
       });
-      
 
-      props.propsMap(features)
-      // console.log(features); 
-      // for (var i = 0; i < features.length; i++) {
-      //   console.log(features[i].properties.parkName);
-      // }
-      // console.log(features.length); //ispark sayısı
+      props.propsMap(features);
     });
-
-
-
-    
   }, [data]);
+
+  useEffect(() => {
+    if (!items.length) return;
+    const local = localStorage.getItem("pushitems");
+    const localArray = JSON.parse(local) !== null ? JSON.parse(local) : [];
+
+    localArray.push(items);
+
+    localStorage.setItem("pushitems", JSON.stringify(localArray));
+
+    props.save(localArray);
+  }, [items]);
+
   return (
     <div className="map-wrap">
       <div ref={mapContainer} className="map" id="map" />
     </div>
   );
 }
+
+const PopupTest = ({ popup, setItems }) => {
+  return (
+    <div>
+      <div>
+        <b>Park ID: </b>
+        {popup.parkID}
+        <br></br>
+        <b>Park Adı: </b>
+        {popup.parkName}
+        <br></br>
+        <b>Kapasite: </b>
+        {popup.capacity}
+        <br></br>
+        <b>Çalışma Saatleri: </b>
+        {popup.workHours}
+        <br></br>
+        <b>Park Tipi: </b>
+        {popup.parkType}
+        <br></br>
+        <b>Ücretsiz Park Süresi: </b>
+        {popup.freeTime}
+        <br></br>
+      </div>
+      <button onClick={() => setItems(popup.parkName)}>Kaydet</button>
+    </div>
+  );
+};

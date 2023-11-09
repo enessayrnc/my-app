@@ -1,0 +1,30 @@
+.parksBox{
+    position: fixed;
+    right: 0;
+    top: 150px;
+    background-color: white;
+    height: 400px;
+    width: 200px;
+    
+    font-size: small;
+    text-align: center;
+    display: flex;
+    align-content: space-between;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: space-between;
+    
+}
+.title{
+    position: sticky;
+    text-align: center;
+}
+.content{
+    height: 300px;
+    width: 200px;
+    overflow-y: scroll;
+}
+button{
+   
+    bottom: 0px;
+}
