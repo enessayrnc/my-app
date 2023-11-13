@@ -15,6 +15,7 @@ export default function Map(props) {
   const [elem, setElem] = useState();
 
   const [items, setItems] = useState([]);
+  // const [items, setItems] = useState({});
 
   //veriye istek atma
   useEffect(() => {
@@ -220,7 +221,23 @@ const PopupTest = ({ popup, setItems }) => {
         {popup.freeTime}
         <br></br>
       </div>
-      <button onClick={() => setItems(popup.parkName)}>Kaydet</button>
+      <button
+        onClick={() =>
+          setItems([
+            {
+              id: popup.parkID,
+              name: popup.parkName,
+              capacity: popup.capacity,
+              name: popup.parkName,
+              workHours: popup.workHours,
+              parkType: popup.parkType,
+              freeTime: popup.freeTime,
+            },
+          ])
+        }
+      >
+        Kaydet
+      </button>
     </div>
   );
 };

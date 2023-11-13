@@ -46,15 +46,7 @@ export default function ListBox({ propsListbox, getclickMap }) {
       .addTo(getclickMap);
     setEnes(popup);
 
-    //   console.log(popup.isOpen())
-    //   if (popup.isOpen()===false) {
-
-    //     popup.addTo(getclickMap);
-
-    // } else {
-    //   popup.remove();
-
-    // }
+  
   };
   return (
     <div className="container">
