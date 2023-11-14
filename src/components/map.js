@@ -14,7 +14,7 @@ export default function Map(props) {
   const [data, setData] = useState();
   const [elem, setElem] = useState();
 
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(null);
   // const [items, setItems] = useState({});
 
   //veriye istek atma
@@ -180,7 +180,7 @@ export default function Map(props) {
   }, [data]);
 
   useEffect(() => {
-    if (!items.length) return;
+    if (!items) return;
     const local = localStorage.getItem("pushitems");
     const localArray = JSON.parse(local) !== null ? JSON.parse(local) : [];
 
@@ -223,7 +223,7 @@ const PopupTest = ({ popup, setItems }) => {
       </div>
       <button
         onClick={() =>
-          setItems([
+          setItems(
             {
               id: popup.parkID,
               name: popup.parkName,
@@ -232,8 +232,8 @@ const PopupTest = ({ popup, setItems }) => {
               workHours: popup.workHours,
               parkType: popup.parkType,
               freeTime: popup.freeTime,
-            },
-          ])
+            }
+          )
         }
       >
         Kaydet

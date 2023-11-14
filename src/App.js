@@ -11,6 +11,7 @@ function App() {
   const [parks, setParks] = useState([]);
   const [open, setOpen] = useState(false);
   const [id, setId] = useState(false);
+
   return (
     <div className="App">
       <Map propsMap={setItems} clickMap={setMap} save={setParks}></Map>
@@ -18,7 +19,7 @@ function App() {
       <SavedParks  setid ={setId} setopen={setOpen} savedParks={parks} setParks={setParks}></SavedParks>
       
       {open ? (
-        <Popup setid={id} savedParks={parks} text="Düzenle!" closePopup={() => setOpen(false)} />
+        <Popup setParks={setParks} id={id} savedParks={parks} text="Düzenle!" closePopup={() => setOpen(false)} />
       ) : null}
     </div>
   );

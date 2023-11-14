@@ -11,29 +11,29 @@ export default function SavedParks({ savedParks, setParks, setopen, setid }) {
 // localStorage.removeItem("pushitems","[]")   
     
 //   }
-console.log(savedParks,'savedparks')
+
   return (
     <div className="parksBox">
       <div className="title"> Kaydettiklerim</div>
       <div className="content">
         {(savedParks).map((elem) => (
           <div className="listItem" >
-            {"Park ID: " + elem[0].id }
+            {"Park ID: " + elem.id }
             <br></br>
-            {"Park Adı: " +elem[0].name}
+            {"Park Adı: " +elem.name}
             <br></br>
-            {"Kapasite: " +elem[0].capacity}
+            {"Kapasite: " +elem.capacity}
             <br></br>
-            {"Çalışma Saatleri: " +elem[0].workHours}
+            {"Çalışma Saatleri: " +elem.workHours}
             <br></br>
-            {"Park Tipi: " +elem[0].parkType}
+            {"Park Tipi: " +elem.parkType}
             <br></br>
-            {"Ücretsiz Park Süresi: " +elem[0].freeTime}
+            {"Ücretsiz Park Süresi: " +elem.freeTime}
             <br></br>
             
             {/* <button onClick={()=> itemRemove()}>Sil</button> */}
             <button onClick={() => {setopen(true)
-               setid(elem[0].id)} }>Düzenle</button>
+               setid(elem.id)} }>Düzenle</button>
            
           </div>
         ))}
