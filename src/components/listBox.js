@@ -1,52 +1,34 @@
 import React, { useState } from "react";
 import "./listBox.css";
 import maplibregl from "maplibre-gl";
+import reactDom from "react-dom";
 
-export default function ListBox({ propsListbox, getclickMap }) {
+export default function ListBox({ propsListbox, getclickMap, setItems }) {
   // console.log(getclickMap);
 
   const [enes, setEnes] = useState();
 
   const handleClick = (elem) => {
+    console.log("🚀 ~ file: listBox.js:12 ~ handleClick ~ elem:", elem)
     getclickMap.flyTo({
       center: elem?.geometry?.coordinates,
       zoom: 15,
     });
 
-    if (enes) {
-      
-      enes.remove();
-
-    }
+    const popupDiv = document.createElement("div");
+    reactDom.render(
+      <PopupTest popup={elem.properties} setItems={setItems} />,
+      popupDiv
+    );
     let popup = new maplibregl.Popup()
       .setLngLat(elem?.geometry?.coordinates)
-      .setHTML(
-        "<b>Park ID: </b>" +
-          elem?.properties?.parkID +
-          "<br>" +
-          "<b>Park Adı: </b>" +
-          elem?.properties?.parkName +
-          "<br>" +
-          "<b>Kapasite: </b>" +
-          elem?.properties?.capacity +
-          "<br>" +
-          "<b>Çalışma Saatleri: </b>" +
-          elem?.properties?.workHours +
-          "<br>" +
-          "<b>Park Tipi: </b>" +
-          elem?.properties?.parkType +
-          "<br>" +
-          "<b>Ücretsiz Park Süresi: </b>" +
-          elem?.properties?.freeTime +
-          " dk" +
-          "<br>" +
-          "<b>İlçe: </b>" +
-          elem?.properties?.district
-      )
+      .setDOMContent(popupDiv)
       .addTo(getclickMap);
     setEnes(popup);
 
-  
+    if (enes) {
+      enes.remove();
+    }
   };
   return (
     <div className="container">
@@ -68,3 +50,45 @@ export default function ListBox({ propsListbox, getclickMap }) {
     </div>
   );
 }
+
+const PopupTest = ({ popup, setItems }) => {
+  return (
+    <div>
+      <div>
+        <b>Park ID: </b>
+        {popup.parkID}
+        <br></br>
+        <b>Park Adı: </b>
+        {popup.parkName}
+        <br></br>
+        <b>Kapasite: </b>
+        {popup.capacity}
+        <br></br>
+        <b>Çalışma Saatleri: </b>
+        {popup.workHours}
+        <br></br>
+        <b>Park Tipi: </b>
+        {popup.parkType}
+        <br></br>
+        <b>Ücretsiz Park Süresi: </b>
+        {popup.freeTime}
+        <br></br>
+      </div>
+      <button
+        onClick={() =>
+          setItems({
+            id: popup.parkID,
+            name: popup.parkName,
+            capacity: popup.capacity,
+            name: popup.parkName,
+            workHours: popup.workHours,
+            parkType: popup.parkType,
+            freeTime: popup.freeTime,
+          })
+        }
+      >
+        Kaydet
+      </button>
+    </div>
+  );
+};

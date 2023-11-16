@@ -67,7 +67,7 @@ export default function Popup({ text, closePopup, savedParks, id, setParks }) {
             <div className="input-box">
               <label>Kapasite: </label>
               <input
-                type="text"
+                type="number"
                 name="capacity"
                 onChange={handleInputChange}
                 value={updatedValues.capacity || ""}
@@ -81,6 +81,7 @@ export default function Popup({ text, closePopup, savedParks, id, setParks }) {
                 name="workHours"
                 onChange={handleInputChange}
                 value={updatedValues.workHours || ""}
+                disabled
               ></input>
             </div>
             {/* PARK TİPİ */}
@@ -108,7 +109,7 @@ export default function Popup({ text, closePopup, savedParks, id, setParks }) {
         <button className="btn-save" onClick={handleSave}>
           Kaydet
         </button>
-        <button onClick={closePopup}>Close Popup</button>
+        <button onClick={closePopup}>Kapat</button>
       </div>
     </div>
   );

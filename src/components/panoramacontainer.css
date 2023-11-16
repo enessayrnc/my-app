@@ -1,0 +1,12 @@
+#panorama-container {
+    position: absolute;
+  width: 600px;
+  height: 300px;
+  top: 0;
+  right: 0;
+  z-index: 999;
+}
+#panorama-iframe{
+    width: 600px;
+    height: 300px;
+}

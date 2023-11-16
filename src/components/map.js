@@ -4,6 +4,8 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "./map.css";
 import images from "../location-dot-duotone (1).png";
 import reactDom from "react-dom";
+import { Panorama } from "cbs-panorama";
+
 
 export default function Map(props) {
   //   const mapContainer = useRef(null);
@@ -12,7 +14,9 @@ export default function Map(props) {
   const [lat] = useState(41.110069);
   const [zoom] = useState(7.6);
   const [data, setData] = useState();
-  const [elem, setElem] = useState();
+  
+  const [coordinate, setCoordinate] = useState();
+
 
   const [items, setItems] = useState(null);
   // const [items, setItems] = useState({});
@@ -41,13 +45,14 @@ export default function Map(props) {
               parkType: jsonData[i].parkType,
               freeTime: jsonData[i].freeTime,
               district: jsonData[i].district,
+              latitude:jsonData[i].lat,
+              longitude:jsonData[i].lng
             },
           });
         }
 
         setData(geojsonData); //geojsonData'ya veriler eklendi. Ve state'ddeki durumu değişti
 
-        // console.log(geojsonData);
       });
   }, []);
   useEffect(() => {
@@ -67,6 +72,8 @@ export default function Map(props) {
     // -----geojsonı haritada gösterme-------
     map.on("load", () => {
       // Add an image to use as a custom marker
+            // Panorama.ConfigureMapLibreMap(map, maplibregl);
+
       map.loadImage(images, (error, image) => {
         if (error) throw error;
         map.addImage("custom-marker", image);
@@ -89,17 +96,12 @@ export default function Map(props) {
           },
         });
       });
+
+
     });
 
     map.on("click", "places", (e) => {
       const coordinates = e.features[0].geometry.coordinates.slice();
-      const parkID = e.features[0].properties.parkID;
-      const parkName = e.features[0].properties.parkName;
-      const capacity = e.features[0].properties.capacity;
-      const workHours = e.features[0].properties.workHours;
-      const parkType = e.features[0].properties.parkType;
-      const freeTime = e.features[0].properties.freeTime;
-      const district = e.features[0].properties.district;
 
       // Ensure that if the map is zoomed out such that multiple
       // copies of the feature are visible, the popup appears
@@ -107,41 +109,19 @@ export default function Map(props) {
       while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
-
+// console.log(coordinates,'cor')
+// setCoordinate(coordinates)
       const popupDiv = document.createElement("div");
       reactDom.render(
         <PopupTest popup={e.features[0].properties} setItems={setItems} />,
         popupDiv
       );
+      console.log(e.features[0].properties)
+
 
       let popup = new maplibregl.Popup()
         .setLngLat(coordinates)
         .setDOMContent(popupDiv)
-        // .setHTML(
-        //   "<b>Park ID: </b>" +
-        //     parkID +
-        //     "<br>" +
-        //     "<b>Park Adı: </b>" +
-        //     parkName +
-        //     "<br>" +
-        //     "<b>Kapasite: </b>" +
-        //     capacity +
-        //     "<br>" +
-        //     "<b>Çalışma Saatleri: </b>" +
-        //     workHours +
-        //     "<br>" +
-        //     "<b>Park Tipi: </b>" +
-        //     parkType +
-        //     "<br>" +
-        //     "<b>Ücretsiz Park Süresi: </b>" +
-        //     freeTime +
-        //     " dk" +
-        //     "<br>" +
-        //     "<b>İlçe: </b>" +
-        //     district +
-        //     "<br>" +
-        //     `<button className='button1' onClick="()=>enes()">KAYDET</button>`
-        // )
         .addTo(map);
 
       map.on("zoomend", function () {
@@ -238,6 +218,9 @@ const PopupTest = ({ popup, setItems }) => {
       >
         Kaydet
       </button>
+
+      <button onClick={()=>Panorama.OpenPanoramaOnLocation(popup.longitude, popup.latitude)} >Sokak Görüntüsü</button>
+
     </div>
   );
 };
