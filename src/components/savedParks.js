@@ -2,7 +2,8 @@ import React from "react";
 import "./savedParks.css";
 
 
-export default function SavedParks({ savedParks, setParks, setopen, setid, setopenpanorama }) {
+export default function SavedParks({ savedParks, setParks, setopen, setid }) {
+  console.log("🚀 ~ file: savedParks.js:6 ~ SavedParks ~ savedParks:", savedParks)
   const allClear = () => {
     localStorage.setItem("pushitems", "[]");
     setParks([]);
@@ -16,7 +17,7 @@ export default function SavedParks({ savedParks, setParks, setopen, setid, setop
     <div className="parksBox">
       <div className="title"> Kaydettiklerim</div>
       <div className="content">
-        {(savedParks).map((elem) => (
+        {savedParks.map((elem) => (
           <div className="listItem" >
             {"Park ID: " + elem.id }
             <br></br>
@@ -33,7 +34,7 @@ export default function SavedParks({ savedParks, setParks, setopen, setid, setop
             
             {/* <button onClick={()=> itemRemove()}>Sil</button> */}
             <button onClick={() => {setopen(true) 
-            setopenpanorama(true)
+            // setopenpanorama(true)
                setid(elem.id)} }>Düzenle</button>
            
           </div>

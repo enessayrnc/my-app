@@ -9,7 +9,7 @@ export default function ListBox({ propsListbox, getclickMap, setItems }) {
   const [enes, setEnes] = useState();
 
   const handleClick = (elem) => {
-    console.log("🚀 ~ file: listBox.js:12 ~ handleClick ~ elem:", elem)
+    console.log("🚀 ~ file: listBox.js:12 ~ handleClick ~ elem:", elem);
     getclickMap.flyTo({
       center: elem?.geometry?.coordinates,
       zoom: 15,
@@ -32,18 +32,48 @@ export default function ListBox({ propsListbox, getclickMap, setItems }) {
   };
   return (
     <div className="container">
-      <div className="title">İspark Otopark Listesi</div>
+      {/* <div className="title">İspark Otopark Listesi</div> */}
       {propsListbox.map((elem) => (
         <>
           <div className="listItem" onClick={() => handleClick(elem)}>
-            {"Park Adı: " + elem.properties.parkName}
+            <div className="rowitem">
+              <div className="subtitle">
+                Park Adı:{" "}
+              </div>
+              <div className="value">{elem.properties.parkName}</div>
+
+            </div>
+            <div className="rowitem">
+              <div className="subtitle">
+                Park Tipi:{" "}
+              </div>
+              <div className="value">{elem.properties.parkType}</div>
+
+            </div>
+            <div className="rowitem">
+              <div className="subtitle">
+                Kapasite:{" "}
+              </div>
+              <div className="value">{elem.properties.capacity}</div>
+
+            </div>
+
+            <div className="rowitem">
+              <div className="subtitle">
+                Çalışma Saatleri:{" "}
+              </div>
+              <div className="value">{elem.properties.workHours}</div>
+
+            </div>
+
+            {/* {"Park Adı: " + elem.properties.parkName}
             <br></br>
             {"Park Tipi: " + elem.properties.parkType}
             <br></br>
 
             {"Kapasite: " + elem.properties.capacity}
             <br></br>
-            {"Çalışma Saatleri: " + elem.properties.workHours}
+            {"Çalışma Saatleri: " + elem.properties.workHours} */}
           </div>
         </>
       ))}

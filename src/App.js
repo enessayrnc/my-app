@@ -5,6 +5,8 @@ import ListBox from "./components/listBox";
 import SavedParks from "./components/savedParks";
 import Popup from "./components/popup";
 import PanoramaContainer from "./components/panoramacontainer";
+import Navbar from "./components/navbar";
+
 
 function App() {
   const [items, setItems] = useState([]);
@@ -12,22 +14,34 @@ function App() {
   const [parks, setParks] = useState([]);
   const [open, setOpen] = useState(false);
   const [id, setId] = useState(false);
-  const [openPanorama, setOpenPanorama] = useState(false);
-
 
   return (
     <div className="App">
-      <Map propsMap={setItems} clickMap={setMap} save={setParks}></Map>
-      <ListBox setItems={setItems} propsListbox={items} getclickMap={map}></ListBox>
-      <SavedParks  setid ={setId} setopen={setOpen} savedParks={parks} setParks={setParks}></SavedParks>
+            <Navbar></Navbar>
 
-     
-      
-        <PanoramaContainer setopenpanorama={setOpenPanorama} closePanorama={() => setOpenPanorama(false)} />
-      
+      <Map propsMap={setItems} clickMap={setMap} save={setParks}></Map>
+      <ListBox
+        setItems={setItems}
+        propsListbox={items}
+        getclickMap={map}
+      ></ListBox>
+      <SavedParks
+        setid={setId}
+        setopen={setOpen}
+        savedParks={parks}
+        setParks={setParks}
+      ></SavedParks>
+
+      <PanoramaContainer />
 
       {open ? (
-        <Popup setParks={setParks} id={id} savedParks={parks} text="Düzenle!" closePopup={() => setOpen(false)} />
+        <Popup
+          setParks={setParks}
+          id={id}
+          savedParks={parks}
+          text="Düzenle!"
+          closePopup={() => setOpen(false)}
+        />
       ) : null}
     </div>
   );

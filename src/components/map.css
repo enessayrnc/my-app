@@ -1,9 +1,12 @@
 .map-wrap {
-  top: 0;
+  /* top: 0;
   right: 0;
     position: absolute;
     width: calc(100vw - 300px) !important;
-    height: 100% !important; 
+    height: 100% !important;  */
+     position: relative;
+  width: 100%;
+  height: calc(100vh - 77px); 
   }
   
   .map {

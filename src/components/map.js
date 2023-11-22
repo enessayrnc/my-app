@@ -6,18 +6,13 @@ import images from "../location-dot-duotone (1).png";
 import reactDom from "react-dom";
 import { Panorama } from "cbs-panorama";
 
-
 export default function Map(props) {
   //   const mapContainer = useRef(null);
   const mapContainer = useRef(null);
   const [lng] = useState(29.068335);
   const [lat] = useState(41.110069);
-  const [zoom] = useState(7.6);
+  const [zoom] = useState(8.8);
   const [data, setData] = useState();
-  
-  const [coordinate, setCoordinate] = useState();
-
-
   const [items, setItems] = useState(null);
   // const [items, setItems] = useState({});
 
@@ -45,34 +40,32 @@ export default function Map(props) {
               parkType: jsonData[i].parkType,
               freeTime: jsonData[i].freeTime,
               district: jsonData[i].district,
-              latitude:jsonData[i].lat,
-              longitude:jsonData[i].lng
+              latitude: jsonData[i].lat,
+              longitude: jsonData[i].lng,
             },
           });
         }
 
         setData(geojsonData); //geojsonData'ya veriler eklendi. Ve state'ddeki durumu değişti
-
       });
   }, []);
   useEffect(() => {
     if (!data) return; // harıtayı data olmadığında boş dönderir. İlk anda veri olmadığı için hataya düşmesini engelliyor.
-
+    console.log("harita oluştu");
     const map = new maplibregl.Map({
       //   container: mapContainer.current,
       container: "map",
-      style:
-        "https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      style: "http://10.6.129.36/map/root_cbs.json",
       center: [lng, lat],
       zoom: zoom,
     });
+    console.log(map.style, "mapstyle");
     props.clickMap(map);
     map.addControl(new maplibregl.NavigationControl());
 
     // -----geojsonı haritada gösterme-------
     map.on("load", () => {
       // Add an image to use as a custom marker
-            // Panorama.ConfigureMapLibreMap(map, maplibregl);
 
       map.loadImage(images, (error, image) => {
         if (error) throw error;
@@ -96,28 +89,71 @@ export default function Map(props) {
           },
         });
       });
-
-
+      map.setPaintProperty("yapi_layer", "fill-extrusion-height", [
+        "case",
+        ["boolean", ["feature-state", "click"], false],
+        ["get", "zemin_ustu_kat_sayisi"],
+        0,
+      ]);
     });
+
+    //yükseklik değiştirme
+    let clickENes = null
+    const changeHeight = (e) => {
+      console.log(clickENes);
+      if (e.features.length > 0) {
+        console.log("🚀 ~ file: map.js:107 ~ changeHeight ~ clickedId:", clickENes)
+        if (clickENes) {
+          map.setFeatureState(
+            { source: "yapi", sourceLayer: "yapi", id: clickENes },
+            { click: false }
+          );
+        }
+
+        map.setFeatureState(
+          { source: "yapi", sourceLayer: "yapi", id: e.features[0].id },
+          { click: true }
+          );
+          map.flyTo({
+            pitch: 40,
+          });
+          
+          console.log("🚀 ~ file: map.js:115 ~ changeHeight ~ e.features[0].id:", e.features[0].id)
+          clickENes = e.features[0].id
+      }
+    };
+
+    //yükseklikleri sıfırlama
+    const clearHeight = (e) => {
+      const clickPoint = map.queryRenderedFeatures(e.point);
+      if (clickPoint[0].layer.id !== "yapi_layer") {
+        console.log("adsbhfıcbdsıhvbj");
+        if (clickENes) {
+          map.setFeatureState(
+            { source: "yapi", sourceLayer: "yapi", id: clickENes },
+            { click: false }
+          );
+        }
+        clickENes = null
+      }
+    };
+
+    map.on("click", "yapi_layer", changeHeight);
+    map.on("click", "yapi_layer", clearHeight);
 
     map.on("click", "places", (e) => {
       const coordinates = e.features[0].geometry.coordinates.slice();
 
-      // Ensure that if the map is zoomed out such that multiple
-      // copies of the feature are visible, the popup appears
-      // over the copy being pointed to.
       while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
-// console.log(coordinates,'cor')
-// setCoordinate(coordinates)
+
       const popupDiv = document.createElement("div");
       reactDom.render(
         <PopupTest popup={e.features[0].properties} setItems={setItems} />,
         popupDiv
       );
-      console.log(e.features[0].properties)
-
+      console.log(e.features[0].properties);
 
       let popup = new maplibregl.Popup()
         .setLngLat(coordinates)
@@ -157,6 +193,9 @@ export default function Map(props) {
 
       props.propsMap(features);
     });
+    return () => {
+      map.remove();
+    };
   }, [data]);
 
   useEffect(() => {
@@ -203,24 +242,27 @@ const PopupTest = ({ popup, setItems }) => {
       </div>
       <button
         onClick={() =>
-          setItems(
-            {
-              id: popup.parkID,
-              name: popup.parkName,
-              capacity: popup.capacity,
-              name: popup.parkName,
-              workHours: popup.workHours,
-              parkType: popup.parkType,
-              freeTime: popup.freeTime,
-            }
-          )
+          setItems({
+            id: popup.parkID,
+            name: popup.parkName,
+            capacity: popup.capacity,
+            name: popup.parkName,
+            workHours: popup.workHours,
+            parkType: popup.parkType,
+            freeTime: popup.freeTime,
+          })
         }
       >
         Kaydet
       </button>
 
-      <button onClick={()=>Panorama.OpenPanoramaOnLocation(popup.longitude, popup.latitude)} >Sokak Görüntüsü</button>
-
+      <button
+        onClick={() =>
+          Panorama.OpenPanoramaOnLocation(popup.longitude, popup.latitude)
+        }
+      >
+        Sokak Görüntüsü
+      </button>
     </div>
   );
 };

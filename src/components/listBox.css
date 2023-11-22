@@ -11,15 +11,16 @@
   position: fixed;
   width: 300px !important;
   overflow-y: scroll;
-  top: 0;
+  top:72px!important;
   bottom: 0;
-  margin-bottom: 24px;
-  margin-top: 24px;
+
 
  
 }
 
 .listItem{
+  display: flex;
+  flex-direction: column;
   padding: 16px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: small;
@@ -37,4 +38,11 @@
   font-weight:bold;
   font-size:24px;
 
+}
+.subtitle{}
+.value{}
+.rowitem{
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 8px;
 }
