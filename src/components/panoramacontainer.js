@@ -16,7 +16,8 @@ export default function PanoramaContainer( ) {
         }, []);
   return (
     <div id="panorama-container">
-          <button id="panorama-close-button">mahmut</button>
+      <div className="panorama-header"></div>
+          <button id="panorama-close-button" className="btn-closee btn-new">Kapat</button>
       <iframe id="panorama-iframe" src=""></iframe>
     </div>
   );

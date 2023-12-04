@@ -1,11 +1,11 @@
 .parksBox{
     position: fixed;
-    right: 0;
-    top: 150px;
+    right: 16px;
+    top: 250px;
     background-color: white;
-    height: 400px;
+    height: 420px;
     width: 200px;
-    
+    border-radius: 16px;
     font-size: small;
     text-align: center;
     display: flex;
@@ -13,6 +13,11 @@
     flex-wrap: wrap;
     flex-direction: column;
     justify-content: space-between;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    align-items: center;
+    padding-top: 16px  !important;
+    padding-bottom:16px !important;
+
     
 }
 .title{
@@ -23,4 +28,20 @@
     height: 300px;
     width: 200px;
     overflow-y: scroll;
+
+}
+.btn-closee{
+    width: 80%;
+}
+.show-hide-button{
+    position: absolute;
+    right: 16px;
+    top: 200px;
+}
+
+.btn-delete{
+    
+    color:#EC1C24 !important;
+  border: 2px solid #EC1C24 !important;
+  background-color: white;
 }

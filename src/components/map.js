@@ -3,18 +3,22 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./map.css";
 import images from "../location-dot-duotone (1).png";
+import images2 from "../location-dot-duotone (3).png";
+
 import reactDom from "react-dom";
 import { Panorama } from "cbs-panorama";
 
+
 export default function Map(props) {
-  //   const mapContainer = useRef(null);
   const mapContainer = useRef(null);
   const [lng] = useState(29.068335);
   const [lat] = useState(41.110069);
   const [zoom] = useState(8.8);
   const [data, setData] = useState();
   const [items, setItems] = useState(null);
-  // const [items, setItems] = useState({});
+  const [enes, setEnes] = useState();
+  const [data2, setData2] = useState();
+  const [maps, setMaps] = useState();
 
   //veriye istek atma
   useEffect(() => {
@@ -47,19 +51,57 @@ export default function Map(props) {
         }
 
         setData(geojsonData); //geojsonData'ya veriler eklendi. Ve state'ddeki durumu değişti
+        console.log(geojsonData, "gejsondata ilk");
+
+        props.propsMap(geojsonData.features); //tüm veri list box'a gönderildi
+        const local = localStorage.getItem("pushitems");
+        const localArray = JSON.parse(local) !== null ? JSON.parse(local) : [];
+        localStorage.setItem("pushitems", JSON.stringify(localArray));
+
+        props.save(localArray);
       });
+    //newgejson oluşturuyor
+    let geojsonData2 = { type: "FeatureCollection", features: [] };
+    const local = localStorage.getItem("pushitems");
+    const localArray = JSON.parse(local) !== null ? JSON.parse(local) : [];
+    console.log(localArray, "localarray");
+    for (var i = 0; i < localArray.length; i++) {
+      geojsonData2.features.push({
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [localArray[i].longitude, localArray[i].latitude],
+        },
+        properties: {
+          parkID: localArray[i].id,
+          parkName: localArray[i].name,
+          capacity: localArray[i].capacity,
+          workHours: localArray[i].workHours,
+          parkType: localArray[i].parkType,
+          freeTime: localArray[i].freeTime,
+          latitude: localArray[i].latitude,
+          longitude: localArray[i].longitude,
+        },
+      });
+    }
+    console.log(geojsonData2, "geojsondata2");
+    setData2(geojsonData2);
+    props.data22(geojsonData2);
   }, []);
+
   useEffect(() => {
     if (!data) return; // harıtayı data olmadığında boş dönderir. İlk anda veri olmadığı için hataya düşmesini engelliyor.
     console.log("harita oluştu");
     const map = new maplibregl.Map({
       //   container: mapContainer.current,
       container: "map",
-      style: "http://10.6.129.36/map/root_cbs.json",
+      // style: "http://10.6.129.36/map/root_cbs.json",
+      style:
+        "https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json",
       center: [lng, lat],
       zoom: zoom,
+      minZoom: 8.8,
     });
-    console.log(map.style, "mapstyle");
     props.clickMap(map);
     map.addControl(new maplibregl.NavigationControl());
 
@@ -89,6 +131,36 @@ export default function Map(props) {
           },
         });
       });
+
+      //savedparks layers added
+      map.loadImage(images2, (error, image2) => {
+        if (error) throw error;
+        map.addImage("custom-marker-saved", image2);
+
+        const local = localStorage.getItem("pushitems");
+        const localArray = JSON.parse(local) !== null ? JSON.parse(local) : [];
+
+        // Add an image to use as a custom marker
+        map.addSource("savedparks", {
+          type: "geojson",
+          data: data2, // Kaydedilmiş park noktalarını temsil eden GeoJSON verisini kullanın
+        });
+        console.log(localArray, "localarray");
+
+        // Add a symbol layer
+        map.addLayer({
+          id: "savedparks",
+          type: "symbol",
+          source: "savedparks",
+          size: "24px",
+          layout: {
+            "icon-image": "custom-marker-saved",
+            "icon-allow-overlap": true,
+            "icon-anchor": "top",
+          },
+        });
+      });
+
       map.setPaintProperty("yapi_layer", "fill-extrusion-height", [
         "case",
         ["boolean", ["feature-state", "click"], false],
@@ -97,12 +169,21 @@ export default function Map(props) {
       ]);
     });
 
+    const haritaVeriKaynaginiGuncelle = (veri) => {
+      if (map) {
+        map.getSource("savedparks")?.setData(veri);
+      }
+    };
+
     //yükseklik değiştirme
-    let clickENes = null
+    let clickENes = null;
     const changeHeight = (e) => {
       console.log(clickENes);
       if (e.features.length > 0) {
-        console.log("🚀 ~ file: map.js:107 ~ changeHeight ~ clickedId:", clickENes)
+        console.log(
+          "🚀 ~ file: map.js:107 ~ changeHeight ~ clickedId:",
+          clickENes
+        );
         if (clickENes) {
           map.setFeatureState(
             { source: "yapi", sourceLayer: "yapi", id: clickENes },
@@ -113,13 +194,16 @@ export default function Map(props) {
         map.setFeatureState(
           { source: "yapi", sourceLayer: "yapi", id: e.features[0].id },
           { click: true }
-          );
-          map.flyTo({
-            pitch: 40,
-          });
-          
-          console.log("🚀 ~ file: map.js:115 ~ changeHeight ~ e.features[0].id:", e.features[0].id)
-          clickENes = e.features[0].id
+        );
+        map.flyTo({
+          pitch: 40,
+        });
+
+        console.log(
+          "🚀 ~ file: map.js:115 ~ changeHeight ~ e.features[0].id:",
+          e.features[0].id
+        );
+        clickENes = e.features[0].id;
       }
     };
 
@@ -134,7 +218,7 @@ export default function Map(props) {
             { click: false }
           );
         }
-        clickENes = null
+        clickENes = null;
       }
     };
 
@@ -149,16 +233,29 @@ export default function Map(props) {
       }
 
       const popupDiv = document.createElement("div");
+
       reactDom.render(
-        <PopupTest popup={e.features[0].properties} setItems={setItems} />,
+        <PopupTest
+          setOpenMessage={props.setOpenMessage}
+          save={props.save}
+          popup={e.features[0].properties}
+          setItems={setItems}
+          maps={maps}
+          data2={data2}
+          haritaVeriKaynaginiGuncelle={haritaVeriKaynaginiGuncelle}
+        />,
         popupDiv
       );
-      console.log(e.features[0].properties);
 
       let popup = new maplibregl.Popup()
         .setLngLat(coordinates)
         .setDOMContent(popupDiv)
         .addTo(map);
+      setEnes(popup);
+
+      if (enes) {
+        enes.remove();
+      }
 
       map.on("zoomend", function () {
         var currentZoom = map.getZoom();
@@ -193,6 +290,8 @@ export default function Map(props) {
 
       props.propsMap(features);
     });
+    setMaps(map);
+
     return () => {
       map.remove();
     };
@@ -201,7 +300,13 @@ export default function Map(props) {
   useEffect(() => {
     if (!items) return;
     const local = localStorage.getItem("pushitems");
+    console.log(local, "local");
     const localArray = JSON.parse(local) !== null ? JSON.parse(local) : [];
+
+    const localId = localArray.findIndex((elem) => elem.id === items.id);
+    if (localId > -1) {
+      localArray.splice(localId, 1);
+    }
 
     localArray.push(items);
 
@@ -210,16 +315,121 @@ export default function Map(props) {
     props.save(localArray);
   }, [items]);
 
+  const [checkedOne, setCheckedOne] = React.useState(true);
+  const [checkedTwo, setCheckedTwo] = React.useState(true);
+
+  const toggleLayers = () => {
+    console.log("checkedOne:", checkedOne, "checkedTwo:", checkedTwo);
+
+    if (checkedOne) {
+      maps.setLayoutProperty("places", "visibility", "visible");
+
+    } else {
+      maps.setLayoutProperty("places", "visibility", "none");
+    }
+
+    if (checkedTwo) {
+      maps.setLayoutProperty("savedparks", "visibility", "visible");
+
+
+    } else {
+      maps.setLayoutProperty("savedparks", "visibility", "none");
+
+    }
+    
+  }
+  
+  
+  const handleChangeOne = () => {
+    toggleLayers();
+
+    setCheckedOne(!checkedOne);
+  };
+  
+  const handleChangeTwo = () => {
+        toggleLayers();
+
+    setCheckedTwo(!checkedTwo);
+  };
+  
+  
   return (
     <div className="map-wrap">
       <div ref={mapContainer} className="map" id="map" />
+
+      <div className="manager-container">
+        <div className="checkbox-content">
+          <label>Tüm İsparklar</label>
+          <input
+            type="checkbox"
+            id="all-parks"
+            checked={checkedOne}
+
+            onChange={handleChangeOne}
+          ></input>
+        </div>
+
+        <div className="checkbox-content">
+          <label>Kaydettiklerim</label>
+          <input
+            type="checkbox"
+            id="my-saved"
+            checked={checkedTwo}
+
+            onChange={handleChangeTwo}
+          ></input>
+        </div>
+
+      </div>
     </div>
   );
-}
 
-const PopupTest = ({ popup, setItems }) => {
+
+
+}
+const PopupTest = ({
+  popup,
+  setItems,
+  setOpenMessage,
+  save,
+  maps,
+  data2,
+  haritaVeriKaynaginiGuncelle,
+}) => {
+  console.log(maps, "maps test"); // Bu, maps objesinin ne olduğunu gösterir
+
+  const savedItems = JSON.parse(localStorage.getItem("pushitems")) || [];
+  const isItemSaved = savedItems.some((item) => item.id === popup.parkID);
+  const saveButtonRef = useRef(null);
+
+  const handleSaveClick = (item) => {
+    const local = localStorage.getItem("pushitems");
+    const localArray = JSON.parse(local) !== null ? JSON.parse(local) : [];
+
+    const localId = localArray.findIndex((elem) => elem.id === item.id);
+    if (localId > -1) {
+      localArray.splice(localId, 1);
+    }
+
+    localArray.push(item);
+
+    localStorage.setItem("pushitems", JSON.stringify(localArray));
+
+    save(localArray);
+
+    saveButtonRef.current.disabled = true;
+  };
+  // const getSources = () => {
+  //   maps.getSource("pushitems").setData(data2);
+
+  // };
+  const veriKaynaginiAl = () => {
+    console.log("data2 aldım verdim bu nedir?", data2);
+    haritaVeriKaynaginiGuncelle(data2); // Harita veri kaynağını güncellemek için fonksiyonu çağırın
+  };
+  console.log(data2, "data2");
   return (
-    <div>
+    <div className="map-popup">
       <div>
         <b>Park ID: </b>
         {popup.parkID}
@@ -239,30 +449,65 @@ const PopupTest = ({ popup, setItems }) => {
         <b>Ücretsiz Park Süresi: </b>
         {popup.freeTime}
         <br></br>
+        <b>Longitude: </b>
+        {popup.longitude}
+        <br></br>
+        <b>Latitude: </b>
+        {popup.latitude}
+        <br></br>
       </div>
-      <button
-        onClick={() =>
-          setItems({
-            id: popup.parkID,
-            name: popup.parkName,
-            capacity: popup.capacity,
-            name: popup.parkName,
-            workHours: popup.workHours,
-            parkType: popup.parkType,
-            freeTime: popup.freeTime,
-          })
-        }
-      >
-        Kaydet
-      </button>
+      <div className="btn-group">
+        <button
+          disabled={isItemSaved}
+          ref={saveButtonRef}
+          className="btn-save"
+          onClick={() => {
+            setOpenMessage(true);
+            handleSaveClick({
+              id: popup.parkID,
+              name: popup.parkName,
+              capacity: popup.capacity,
+              name: popup.parkName,
+              workHours: popup.workHours,
+              parkType: popup.parkType,
+              freeTime: popup.freeTime,
+              longitude: popup.longitude,
+              latitude: popup.latitude,
+            });
+            const newData2 = data2.features.push({
+              type: "Feature",
+              geometry: {
+                type: "Point",
+                coordinates: [popup.longitude, popup.latitude],
+              },
+              properties: {
+                id: popup.parkID,
+                name: popup.parkName,
+                capacity: popup.capacity,
+                name: popup.parkName,
+                workHours: popup.workHours,
+                parkType: popup.parkType,
+                freeTime: popup.freeTime,
+                longitude: popup.longitude,
+                latitude: popup.latitude,
+              },
+            });
+            haritaVeriKaynaginiGuncelle(data2);
+            console.log("data2 aldım verdim bu nedir?", popup);
+          }}
+        >
+          Kaydet
+        </button>
 
-      <button
-        onClick={() =>
-          Panorama.OpenPanoramaOnLocation(popup.longitude, popup.latitude)
-        }
-      >
-        Sokak Görüntüsü
-      </button>
+        <button
+          className="btn-closee"
+          onClick={() =>
+            Panorama.OpenPanoramaOnLocation(popup.longitude, popup.latitude)
+          }
+        >
+          Sokak Görüntüsü
+        </button>
+      </div>
     </div>
   );
 };

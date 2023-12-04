@@ -1,0 +1,13 @@
+.manager-container{
+    position: absolute;
+    right:100px;
+    top: 10px;
+
+}
+
+.checkbox-content{
+    display: flex;
+    justify-content: space-between;
+   
+
+}

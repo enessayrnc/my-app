@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./popup.css";
 
-export default function Popup({ text, closePopup, savedParks, id, setParks }) {
+export default function Popup({ text, closePopup, savedParks, id, setParks, setOpenMessage }) {
   const [updatedValues, setUpdatedValues] = useState(null);
 
   useEffect(() => {
@@ -106,10 +106,18 @@ export default function Popup({ text, closePopup, savedParks, id, setParks }) {
             </div>
           </div>
         )}
-        <button className="btn-save" onClick={handleSave}>
+        <div className="btn-group">
+        <button className="btn-save btn-popup" onClick={() => {
+                    setOpenMessage(true);
+                    handleSave();
+                    // setopenpanorama(true)
+                    
+                  }}>
           Kaydet
         </button>
-        <button onClick={closePopup}>Kapat</button>
+        <button className="btn-closee btn-popup" onClick={closePopup}>Kapat</button>
+        </div>
+       
       </div>
     </div>
   );

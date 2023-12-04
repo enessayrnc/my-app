@@ -2,11 +2,24 @@
     position: absolute;
   width: 600px;
   height: 300px;
-  top: 0;
+  left: 300px;
+  bottom:0;
   right: 0;
   z-index: 999;
 }
 #panorama-iframe{
     width: 600px;
     height: 300px;
+}
+.panorama-header{
+  display: flex;
+  width: 100%;
+  background-color: #607080;
+  height: 44px;
+  position: absolute;
+  top: 18px;
+  z-index: -999;
+}
+.btn-new{
+  border-radius: none !important;
 }

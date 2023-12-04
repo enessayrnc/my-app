@@ -4,10 +4,10 @@
     position: absolute;
     width: calc(100vw - 300px) !important;
     height: 100% !important;  */
-     position: relative;
-  width: 100%;
+     position: absolute;
+  width: calc(100vw - 300px);
   height: calc(100vh - 77px); 
-  }
+right: 0;  }
   
   .map {
     position: absolute;
@@ -19,3 +19,28 @@
 
     color: "red";
   }
+  .btn-group{
+    display: flex;
+    width: 100%;
+    gap: 8px;
+    margin-top:8px;
+    margin-bottom: 0;
+    justify-content: center;
+
+  }
+  .map-popup{
+    align-items: center;
+  }
+  .manager-container{
+    position: absolute;
+    right:100px;
+    top: -56px;
+
+}
+
+.checkbox-content{
+    display: flex;
+    justify-content: space-between;
+   
+
+}
