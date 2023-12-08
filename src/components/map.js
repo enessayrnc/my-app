@@ -6,8 +6,6 @@ import images from "../location-dot-duotone (1).png";
 import images2 from "../location-dot-duotone (3).png";
 
 import reactDom from "react-dom";
-import { Panorama } from "cbs-panorama";
-
 
 export default function Map(props) {
   const mapContainer = useRef(null);
@@ -16,7 +14,6 @@ export default function Map(props) {
   const [zoom] = useState(8.8);
   const [data, setData] = useState();
   const [items, setItems] = useState(null);
-  const [enes, setEnes] = useState();
   const [data2, setData2] = useState();
   const [maps, setMaps] = useState();
 
@@ -84,7 +81,6 @@ export default function Map(props) {
         },
       });
     }
-    console.log(geojsonData2, "geojsondata2");
     setData2(geojsonData2);
     props.data22(geojsonData2);
   }, []);
@@ -95,9 +91,9 @@ export default function Map(props) {
     const map = new maplibregl.Map({
       //   container: mapContainer.current,
       container: "map",
-      // style: "http://10.6.129.36/map/root_cbs.json",
-      style:
-        "https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      style: "http://10.6.129.36/map/root_cbs.json",
+      // style:
+      //   "https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json",
       center: [lng, lat],
       zoom: zoom,
       minZoom: 8.8,
@@ -107,6 +103,8 @@ export default function Map(props) {
 
     // -----geojsonı haritada gösterme-------
     map.on("load", () => {
+      props.panorama.ConfigureMapLibreMap(map, maplibregl);
+      // console.log(props.panorama, 'lütfü')
       // Add an image to use as a custom marker
 
       map.loadImage(images, (error, image) => {
@@ -197,8 +195,8 @@ export default function Map(props) {
         );
         map.flyTo({
           pitch: 40,
+          // zoom: 17,
         });
-
         console.log(
           "🚀 ~ file: map.js:115 ~ changeHeight ~ e.features[0].id:",
           e.features[0].id
@@ -225,24 +223,47 @@ export default function Map(props) {
     map.on("click", "yapi_layer", changeHeight);
     map.on("click", "yapi_layer", clearHeight);
 
-    map.on("click", "places", (e) => {
-      const coordinates = e.features[0].geometry.coordinates.slice();
+    map.on("click", (e) => {
+      let feature;
+      const renderedFeatures = e.target.queryRenderedFeatures(e.point);
+      console.log(renderedFeatures)
+      const savedParkFeatures = renderedFeatures.filter(
+        (x) => x.layer.id === "savedparks"
+      );
+      if (savedParkFeatures.length > 0) {
+        feature = savedParkFeatures[0];
+      } else {
+        const placesFeatures = renderedFeatures.filter(
+          (x) => x.layer.id === "places"
+        );
+        if (placesFeatures.length > 0) {
+          feature = placesFeatures[0];
+        } else {
+          return;
+        }
+      }
+      const coordinates = feature.geometry.coordinates.slice();
 
       while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
-
+      if (!props.acikpopup) { 
+        props.panorama.HidePanoramaFrame(e)
+        
+      }
+      
       const popupDiv = document.createElement("div");
 
       reactDom.render(
         <PopupTest
           setOpenMessage={props.setOpenMessage}
           save={props.save}
-          popup={e.features[0].properties}
+          popup={feature.properties}
           setItems={setItems}
           maps={maps}
           data2={data2}
           haritaVeriKaynaginiGuncelle={haritaVeriKaynaginiGuncelle}
+          panorama={props.panorama}
         />,
         popupDiv
       );
@@ -251,10 +272,10 @@ export default function Map(props) {
         .setLngLat(coordinates)
         .setDOMContent(popupDiv)
         .addTo(map);
-      setEnes(popup);
+      props.setAcikpopup(popup);
 
-      if (enes) {
-        enes.remove();
+      if (props.acikpopup) {
+        props.acikpopup.remove();
       }
 
       map.on("zoomend", function () {
@@ -265,11 +286,13 @@ export default function Map(props) {
         }
       });
     });
+
+
     //noktaya tıklandığında haritanın merkezine orayı alarak zoom seviyesini 15 yapar
     map.on("click", "places", (e) => {
       map.flyTo({
         center: e.features[0].geometry.coordinates,
-        zoom: 15,
+        zoom: 17,
       });
     });
 
@@ -315,89 +338,71 @@ export default function Map(props) {
     props.save(localArray);
   }, [items]);
 
-  const [checkedOne, setCheckedOne] = React.useState(true);
-  const [checkedTwo, setCheckedTwo] = React.useState(true);
+  const [checkedOne, setCheckedOne] = useState(true);
+  const [checkedTwo, setCheckedTwo] = useState(true);
 
-  const toggleLayers = () => {
-    console.log("checkedOne:", checkedOne, "checkedTwo:", checkedTwo);
+  useEffect(() => {
+    if (!maps) return;
 
-    if (checkedOne) {
-      maps.setLayoutProperty("places", "visibility", "visible");
-
-    } else {
-      maps.setLayoutProperty("places", "visibility", "none");
+    if (maps.getLayer("places")) {
+      if (checkedOne) {
+        maps.setLayoutProperty("places", "visibility", "visible");
+      } else {
+        maps.setLayoutProperty("places", "visibility", "none");
+      }
     }
+    if (!maps) return;
 
-    if (checkedTwo) {
-      maps.setLayoutProperty("savedparks", "visibility", "visible");
-
-
-    } else {
-      maps.setLayoutProperty("savedparks", "visibility", "none");
-
+    if (maps.getLayer("savedparks")) {
+      if (checkedTwo) {
+        maps.setLayoutProperty("savedparks", "visibility", "visible");
+      } else {
+        maps.setLayoutProperty("savedparks", "visibility", "none");
+      }
     }
-    
-  }
-  
-  
-  const handleChangeOne = () => {
-    toggleLayers();
+  }, [maps, checkedOne, checkedTwo]);
 
-    setCheckedOne(!checkedOne);
-  };
-  
-  const handleChangeTwo = () => {
-        toggleLayers();
-
-    setCheckedTwo(!checkedTwo);
-  };
-  
-  
   return (
     <div className="map-wrap">
       <div ref={mapContainer} className="map" id="map" />
 
       <div className="manager-container">
-        <div className="checkbox-content">
-          <label>Tüm İsparklar</label>
-          <input
-            type="checkbox"
-            id="all-parks"
-            checked={checkedOne}
+        <div className="manager-title">Katman Yöneticisi</div>
+        <div className="vertical-line"></div>
 
-            onChange={handleChangeOne}
-          ></input>
+        <div className="checkbox-box">
+          <div className="checkbox-content">
+            <div className="labels">Tüm İsparklar</div>
+            <input
+              type="checkbox"
+              id="all-parks"
+              checked={checkedOne}
+              onChange={() => setCheckedOne(!checkedOne)}
+            ></input>
+          </div>
+
+          <div className="checkbox-content">
+            <div className="labels">Kaydettiklerim</div>
+            <input
+              type="checkbox"
+              id="my-saved"
+              checked={checkedTwo}
+              onChange={() => setCheckedTwo(!checkedTwo)}
+            ></input>
+          </div>
         </div>
-
-        <div className="checkbox-content">
-          <label>Kaydettiklerim</label>
-          <input
-            type="checkbox"
-            id="my-saved"
-            checked={checkedTwo}
-
-            onChange={handleChangeTwo}
-          ></input>
-        </div>
-
       </div>
     </div>
   );
-
-
-
 }
 const PopupTest = ({
   popup,
-  setItems,
   setOpenMessage,
   save,
-  maps,
   data2,
   haritaVeriKaynaginiGuncelle,
+  panorama
 }) => {
-  console.log(maps, "maps test"); // Bu, maps objesinin ne olduğunu gösterir
-
   const savedItems = JSON.parse(localStorage.getItem("pushitems")) || [];
   const isItemSaved = savedItems.some((item) => item.id === popup.parkID);
   const saveButtonRef = useRef(null);
@@ -467,7 +472,6 @@ const PopupTest = ({
               id: popup.parkID,
               name: popup.parkName,
               capacity: popup.capacity,
-              name: popup.parkName,
               workHours: popup.workHours,
               parkType: popup.parkType,
               freeTime: popup.freeTime,
@@ -484,7 +488,6 @@ const PopupTest = ({
                 id: popup.parkID,
                 name: popup.parkName,
                 capacity: popup.capacity,
-                name: popup.parkName,
                 workHours: popup.workHours,
                 parkType: popup.parkType,
                 freeTime: popup.freeTime,
@@ -502,7 +505,7 @@ const PopupTest = ({
         <button
           className="btn-closee"
           onClick={() =>
-            Panorama.OpenPanoramaOnLocation(popup.longitude, popup.latitude)
+            panorama.OpenPanoramaOnLocation(popup.longitude, popup.latitude)
           }
         >
           Sokak Görüntüsü
@@ -511,3 +514,123 @@ const PopupTest = ({
     </div>
   );
 };
+
+//kaydedilenler popup
+// const PopupTestSaved = ({
+//   popup,
+//   setOpenMessage,
+//   save,
+//   data2,
+//   haritaVeriKaynaginiGuncelle,
+// }) => {
+//   const savedItems = JSON.parse(localStorage.getItem("pushitems")) || [];
+//   const isItemSaved = savedItems.some((item) => item.id === popup.parkID);
+//   const saveButtonRef = useRef(null);
+
+//   const handleSaveClick = (item) => {
+//     const local = localStorage.getItem("pushitems");
+//     const localArray = JSON.parse(local) !== null ? JSON.parse(local) : [];
+
+//     const localId = localArray.findIndex((elem) => elem.id === item.id);
+//     if (localId > -1) {
+//       localArray.splice(localId, 1);
+//     }
+
+//     localArray.push(item);
+
+//     localStorage.setItem("pushitems", JSON.stringify(localArray));
+
+//     save(localArray);
+
+//     saveButtonRef.current.disabled = true;
+//   };
+//   // const getSources = () => {
+//   //   maps.getSource("pushitems").setData(data2);
+
+//   // };
+//   const veriKaynaginiAl = () => {
+//     console.log("data2 aldım verdim bu nedir?", data2);
+//     haritaVeriKaynaginiGuncelle(data2); // Harita veri kaynağını güncellemek için fonksiyonu çağırın
+//   };
+//   console.log(data2, "data2");
+//   return (
+//     <div className="map-popup">
+//       <div>
+//         <b>Park ID: </b>
+//         {popup.parkID}
+//         <br></br>
+//         <b>Park Adı: </b>
+//         {popup.parkName}
+//         <br></br>
+//         <b>Kapasite: </b>
+//         {popup.capacity}
+//         <br></br>
+//         <b>Çalışma Saatleri: </b>
+//         {popup.workHours}
+//         <br></br>
+//         <b>Park Tipi: </b>
+//         {popup.parkType}
+//         <br></br>
+//         <b>Ücretsiz Park Süresi: </b>
+//         {popup.freeTime}
+//         <br></br>
+//         <b>Longitude: </b>
+//         {popup.longitude}
+//         <br></br>
+//         <b>Latitude: </b>
+//         {popup.latitude}
+//         <br></br>
+//       </div>
+//       <div className="btn-group">
+//         <button
+//           disabled={isItemSaved}
+//           ref={saveButtonRef}
+//           className="btn-save"
+//           onClick={() => {
+//             setOpenMessage(true);
+//             handleSaveClick({
+//               id: popup.parkID,
+//               name: popup.parkName,
+//               capacity: popup.capacity,
+//               workHours: popup.workHours,
+//               parkType: popup.parkType,
+//               freeTime: popup.freeTime,
+//               longitude: popup.longitude,
+//               latitude: popup.latitude,
+//             });
+//             const newData2 = data2.features.push({
+//               type: "Feature",
+//               geometry: {
+//                 type: "Point",
+//                 coordinates: [popup.longitude, popup.latitude],
+//               },
+//               properties: {
+//                 id: popup.parkID,
+//                 name: popup.parkName,
+//                 capacity: popup.capacity,
+//                 workHours: popup.workHours,
+//                 parkType: popup.parkType,
+//                 freeTime: popup.freeTime,
+//                 longitude: popup.longitude,
+//                 latitude: popup.latitude,
+//               },
+//             });
+//             haritaVeriKaynaginiGuncelle(data2);
+//             console.log("data2 aldım verdim bu nedir?", popup);
+//           }}
+//         >
+//           Kaydet
+//         </button>
+
+//         <button
+//           className="btn-closee"
+//           onClick={() =>
+//             Panorama.OpenPanoramaOnLocation(popup.longitude, popup.latitude)
+//           }
+//         >
+//           Sokak Görüntüsü
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };

@@ -17,6 +17,11 @@ function App() {
   const [open, setOpen] = useState(false);
   const [openMessage, setOpenMessage] = useState(false);
   const [data22, setData22] = useState(false);
+  const [acikpopup, setAcikpopup] = useState(false);
+  const [panorama, setPanorama] = useState([]);
+
+
+
 
   
 
@@ -34,6 +39,10 @@ function App() {
         clickMap={setMap}
         save={setParks}
         data22={setData22}
+        setAcikpopup ={setAcikpopup}
+        acikpopup={acikpopup}
+        panorama = {panorama}
+
       ></Map>
       <ListBox
         setOpenMessage={setOpenMessage}
@@ -42,6 +51,14 @@ function App() {
         propsListbox={items}
         getclickMap={map}
         data22={data22}
+        setAcikpopup ={setAcikpopup}
+        acikpopup={acikpopup}
+        savedParks={parks}
+        panorama = {panorama}
+
+
+
+
 
       ></ListBox>
       <SavedParks
@@ -51,6 +68,15 @@ function App() {
         setParks={setParks}
         getclickMap={map}
         data22={data22}
+        setOpenMessage={setOpenMessage}
+        setAcikpopup ={setAcikpopup}
+        acikpopup={acikpopup}
+                panorama = {panorama}
+
+
+
+
+
 
       ></SavedParks>
 
@@ -58,11 +84,15 @@ function App() {
         <Message closeMessage={() => setOpenMessage(false)} />
       ) : null}
 
-      <PanoramaContainer />
+      <PanoramaContainer
+              setPanorama={setPanorama}
+              />
 
       {open ? (
         <Popup
           setOpenMessage={setOpenMessage}
+          getclickMap={map}
+
           setParks={setParks}
           id={id}
           savedParks={parks}

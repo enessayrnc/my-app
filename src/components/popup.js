@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./popup.css";
 
-export default function Popup({ text, closePopup, savedParks, id, setParks, setOpenMessage }) {
+export default function Popup({ text, closePopup, savedParks, id, setParks, setOpenMessage, getclickMap }) {
   const [updatedValues, setUpdatedValues] = useState(null);
 
   useEffect(() => {
@@ -36,10 +36,48 @@ export default function Popup({ text, closePopup, savedParks, id, setParks, setO
     closePopup();
   };
 
+
+  //test
+  const newfunction = () => {
+    const local = localStorage.getItem("pushitems");
+    const localArray = JSON.parse(local) !== null ? JSON.parse(local) : [];
+let geojsonData3 = { type: "FeatureCollection", features: [] };
+
+for (var i = 0; i < localArray.length; i++) {
+    geojsonData3.features.push({
+    type: "Feature",
+    geometry: {
+      type: "Point",
+      coordinates: [localArray[i].longitude, localArray[i].latitude],
+    },
+    properties: {
+      parkID: localArray[i].id,
+      parkName: localArray[i].name,
+      capacity: localArray[i].capacity,
+      workHours: localArray[i].workHours,
+      parkType: localArray[i].parkType,
+      freeTime: localArray[i].freeTime,
+      longitude: localArray[i].longitude,
+      latitude: localArray[i].latitude,
+    },
+    
+  });
+  console.log(localArray, 'geojsondata3')
+  
+
+}
+    console.log(localArray, "iiii")
+    getclickMap.getSource("savedparks").setData(geojsonData3);
+  }
+//test
+
+
+
   return (
     <div className="popup-container">
       <div className="popup-body">
         <h1>{text}</h1>
+        <p className="explain">Kaydettiğiniz parkları burada düzenleyerek kişiselleştirebilirsiniz.</p>
         {updatedValues && (
           <div className="list-items">
             {/* PARK ID */}
@@ -101,7 +139,7 @@ export default function Popup({ text, closePopup, savedParks, id, setParks, setO
                 type="number"
                 name="freeTime"
                 onChange={handleInputChange}
-                value={updatedValues.freeTime || 0}
+                value={updatedValues.freeTime || ""}
               ></input>
             </div>
           </div>
@@ -110,6 +148,7 @@ export default function Popup({ text, closePopup, savedParks, id, setParks, setO
         <button className="btn-save btn-popup" onClick={() => {
                     setOpenMessage(true);
                     handleSave();
+                    newfunction();
                     // setopenpanorama(true)
                     
                   }}>

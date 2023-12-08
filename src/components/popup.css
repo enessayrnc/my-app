@@ -84,3 +84,10 @@
 .btn-popup{
   width: 100%;
 }
+.explain{
+  color: #607080;
+  padding-right: 16px;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.25;
+}

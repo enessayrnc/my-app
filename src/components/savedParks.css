@@ -1,9 +1,10 @@
 .parksBox{
     position: fixed;
     right: 16px;
-    top: 250px;
+    top: 230px;
+    background-color:#F3F4F6;
     background-color: white;
-    height: 420px;
+    height: 440px;
     width: 200px;
     border-radius: 16px;
     font-size: small;
@@ -23,11 +24,15 @@
 .title{
     position: sticky;
     text-align: center;
+
 }
 .content{
     height: 300px;
     width: 200px;
     overflow-y: scroll;
+    background-color: white;
+
+
 
 }
 .btn-closee{
@@ -36,7 +41,7 @@
 .show-hide-button{
     position: absolute;
     right: 16px;
-    top: 200px;
+    top: 180px;
 }
 
 .btn-delete{
@@ -44,4 +49,7 @@
     color:#EC1C24 !important;
   border: 2px solid #EC1C24 !important;
   background-color: white;
+}
+.btn-all-clear{
+    padding-top:16px ;
 }

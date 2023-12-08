@@ -2,35 +2,39 @@ import React, { useRef, useState } from "react";
 import "./listBox.css";
 import maplibregl from "maplibre-gl";
 import reactDom from "react-dom";
-import { Panorama } from "cbs-panorama";
 
 export default function ListBox({
   propsListbox,
   getclickMap,
   save,
   setOpenMessage,
-  data22
+  data22,
+  setAcikpopup,
+  acikpopup,
+  panorama
 }) {
-  // console.log(getclickMap);
-
-  const [enes, setEnes] = useState();
-
-
   const haritaVeriKaynaginiGuncelle = (veri) => {
     if (getclickMap) {
       getclickMap.getSource("savedparks")?.setData(veri);
     }
   };
   const handleClick = (elem) => {
-    if (enes) {
-      enes.remove();
+    if (acikpopup) {
+      acikpopup.remove();
     }
-    console.log("🚀 ~ file: listBox.js:12 ~ handleClick ~ elem:", elem);
+
+    console.log(
+      "🚀 ~ file: listBox.js:12 ~ handleClick ~ elem:",
+      elem?.geometry?.coordinates
+    );
     getclickMap.flyTo({
       center: elem?.geometry?.coordinates,
-      zoom: 15,
+      zoom: 17,
     });
+
     
+    
+      
     
     const popupDiv = document.createElement("div");
     reactDom.render(
@@ -40,7 +44,8 @@ export default function ListBox({
         setOpenMessage={setOpenMessage}
         haritaVeriKaynaginiGuncelle={haritaVeriKaynaginiGuncelle}
         data22={data22}
-
+        getclickMap={getclickMap}
+        panorama={panorama}
       />,
       popupDiv
     );
@@ -48,21 +53,35 @@ export default function ListBox({
       .setLngLat(elem?.geometry?.coordinates)
       .setDOMContent(popupDiv)
       .addTo(getclickMap);
-    setEnes(popup);
+    setAcikpopup(popup);
 
-   
+    getclickMap.on("zoomend", function () {
+      var currentZoom = getclickMap.getZoom();
+
+      if (currentZoom <= 12) {
+        popup.remove(); // Pop-up'ı kapat
+      }
+    });
   };
-  
+  const panoramaFunc = () => {
+    panorama.HidePanoramaFrame()
+
+  }
+
   return (
     <div className="container">
+      {/* <button className="btn-hide">Gizle</button>
+
+      <button className="btn-expand">Genişlet</button> */}
+
       <label className="label-listbox">
         {propsListbox.length} adet İSPARK görüntülüyorsunuz.
       </label>
 
-      {/* <div className="title">İspark Otopark Listesi</div> */}
       {propsListbox.map((elem) => (
         <>
-          <div className="listItem" onClick={() => handleClick(elem)}>
+          <div className="listItem" onClick={() => {handleClick(elem)
+          panoramaFunc()}}>
             <div className="rowitem">
               <div className="subtitle">Park ID: </div>
               <div className="values">{elem.properties.parkID}</div>
@@ -85,22 +104,11 @@ export default function ListBox({
               <div className="values">{elem.properties.workHours}</div>
             </div>
             <div className="rowitem">
-              <div className="subtitle">Longitude: </div>
-              <div className="values">{elem.properties.longitude}</div>
+              <div className="subtitle">Koordinatlar: </div>
+              <div className="values">
+                {elem.properties.latitude}, {elem.properties.longitude}
+              </div>
             </div>
-            <div className="rowitem">
-              <div className="subtitle">Latitude: </div>
-              <div className="values">{elem.properties.latitude}</div>
-            </div>
-
-            {/* {"Park Adı: " + elem.properties.parkName}
-            <br></br>
-            {"Park Tipi: " + elem.properties.parkType}
-            <br></br>
-
-            {"Kapasite: " + elem.properties.capacity}
-            <br></br>
-            {"Çalışma Saatleri: " + elem.properties.workHours} */}
           </div>
         </>
       ))}
@@ -108,15 +116,21 @@ export default function ListBox({
   );
 }
 
-const PopupTest = ({ popup, save, setOpenMessage, data22, haritaVeriKaynaginiGuncelle }) => {
-
+const PopupTest = ({
+  popup,
+  save,
+  setOpenMessage,
+  data22,
+  haritaVeriKaynaginiGuncelle,
+  getclickMap,
+  panorama
+}) => {
   const savedItems = JSON.parse(localStorage.getItem("pushitems")) || [];
-  const isItemSaved = savedItems.some(item => item.id === popup.parkID);
+  const isItemSaved = savedItems.some((item) => item.id === popup.parkID);
 
-  const saveButtonRef = useRef(null)
+  const saveButtonRef = useRef(null);
 
   const handleSaveClick = (item) => {
-    console.log("asdjbfahsıdbf");
     const local = localStorage.getItem("pushitems");
     const localArray = JSON.parse(local) !== null ? JSON.parse(local) : [];
 
@@ -131,12 +145,19 @@ const PopupTest = ({ popup, save, setOpenMessage, data22, haritaVeriKaynaginiGun
 
     save(localArray);
 
-    saveButtonRef.current.disabled = true
+    saveButtonRef.current.disabled = true;
+  };
 
+  const newfunction = () => {
+    const local = localStorage.getItem("pushitems");
+    const localArray = JSON.parse(local) !== null ? JSON.parse(local) : [];
+
+    getclickMap.getSource("savedparks")?.setData(localArray);
   };
   return (
     <div className="map-popup">
       <div>
+        {/* {if(popup.parkID == data22)} */}
         <b>Park ID: </b>
         {popup.parkID}
         <br></br>
@@ -168,41 +189,41 @@ const PopupTest = ({ popup, save, setOpenMessage, data22, haritaVeriKaynaginiGun
           ? () : ()
         }  */}
         <button
-        disabled={isItemSaved}
+          disabled={isItemSaved}
           ref={saveButtonRef}
           className="btn-save"
           onClick={() => {
-              setOpenMessage(true);
-              handleSaveClick({
+            setOpenMessage(true);
+            handleSaveClick({
+              id: popup.parkID,
+              name: popup.parkName,
+              capacity: popup.capacity,
+              workHours: popup.workHours,
+              parkType: popup.parkType,
+              freeTime: popup.freeTime,
+              longitude: popup.longitude,
+              latitude: popup.latitude,
+            });
+            const newData2 = data22.features.push({
+              type: "Feature",
+              geometry: {
+                type: "Point",
+                coordinates: [popup.longitude, popup.latitude],
+              },
+              properties: {
                 id: popup.parkID,
                 name: popup.parkName,
                 capacity: popup.capacity,
-                name: popup.parkName,
                 workHours: popup.workHours,
                 parkType: popup.parkType,
                 freeTime: popup.freeTime,
-                longitude:popup.longitude,
-                latitude:popup.latitude
-              });
-              const newData2 = data22.features.push({
-                type: "Feature",
-                geometry: {
-                  type: "Point",
-                  coordinates: [popup.longitude, popup.latitude],
-                },
-                properties: {
-                  id: popup.parkID,
-                  name: popup.parkName,
-                  capacity: popup.capacity,
-                  name: popup.parkName,
-                  workHours: popup.workHours,
-                  parkType: popup.parkType,
-                  freeTime: popup.freeTime,
-                  longitude: popup.longitude,
-                  latitude: popup.latitude
-                },
-              })
-              haritaVeriKaynaginiGuncelle(data22)
+                longitude: popup.longitude,
+                latitude: popup.latitude,
+              },
+            });
+            haritaVeriKaynaginiGuncelle(data22);
+            newfunction();
+            console.log(data22, "ha bu data22");
           }}
         >
           Kaydet
@@ -211,7 +232,7 @@ const PopupTest = ({ popup, save, setOpenMessage, data22, haritaVeriKaynaginiGun
         <button
           className="btn-closee"
           onClick={() =>
-            Panorama.OpenPanoramaOnLocation(popup.longitude, popup.latitude)
+            panorama.OpenPanoramaOnLocation(popup.longitude, popup.latitude)
           }
         >
           Sokak Görüntüsü
