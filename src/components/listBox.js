@@ -82,14 +82,16 @@ export default function ListBox({
         <>
           <div className="listItem" onClick={() => {handleClick(elem)
           panoramaFunc()}}>
+                          <div className="listItem-title">{elem.properties.parkName}</div>
+
             <div className="rowitem">
               <div className="subtitle">Park ID: </div>
               <div className="values">{elem.properties.parkID}</div>
             </div>
-            <div className="rowitem">
+            {/* <div className="rowitem">
               <div className="subtitle">Park Adı: </div>
               <div className="values">{elem.properties.parkName}</div>
-            </div>
+            </div> */}
             <div className="rowitem">
               <div className="subtitle">Park Tipi: </div>
               <div className="values">{elem.properties.parkType}</div>

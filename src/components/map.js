@@ -103,7 +103,7 @@ export default function Map(props) {
 
     // -----geojsonı haritada gösterme-------
     map.on("load", () => {
-      props.panorama.ConfigureMapLibreMap(map, maplibregl);
+      // props.panorama.ConfigureMapLibreMap(map, maplibregl);
       // console.log(props.panorama, 'lütfü')
       // Add an image to use as a custom marker
 
@@ -311,6 +311,7 @@ export default function Map(props) {
         layers: ["places"],
       });
 
+
       props.propsMap(features);
     });
     setMaps(map);
@@ -515,122 +516,3 @@ const PopupTest = ({
   );
 };
 
-//kaydedilenler popup
-// const PopupTestSaved = ({
-//   popup,
-//   setOpenMessage,
-//   save,
-//   data2,
-//   haritaVeriKaynaginiGuncelle,
-// }) => {
-//   const savedItems = JSON.parse(localStorage.getItem("pushitems")) || [];
-//   const isItemSaved = savedItems.some((item) => item.id === popup.parkID);
-//   const saveButtonRef = useRef(null);
-
-//   const handleSaveClick = (item) => {
-//     const local = localStorage.getItem("pushitems");
-//     const localArray = JSON.parse(local) !== null ? JSON.parse(local) : [];
-
-//     const localId = localArray.findIndex((elem) => elem.id === item.id);
-//     if (localId > -1) {
-//       localArray.splice(localId, 1);
-//     }
-
-//     localArray.push(item);
-
-//     localStorage.setItem("pushitems", JSON.stringify(localArray));
-
-//     save(localArray);
-
-//     saveButtonRef.current.disabled = true;
-//   };
-//   // const getSources = () => {
-//   //   maps.getSource("pushitems").setData(data2);
-
-//   // };
-//   const veriKaynaginiAl = () => {
-//     console.log("data2 aldım verdim bu nedir?", data2);
-//     haritaVeriKaynaginiGuncelle(data2); // Harita veri kaynağını güncellemek için fonksiyonu çağırın
-//   };
-//   console.log(data2, "data2");
-//   return (
-//     <div className="map-popup">
-//       <div>
-//         <b>Park ID: </b>
-//         {popup.parkID}
-//         <br></br>
-//         <b>Park Adı: </b>
-//         {popup.parkName}
-//         <br></br>
-//         <b>Kapasite: </b>
-//         {popup.capacity}
-//         <br></br>
-//         <b>Çalışma Saatleri: </b>
-//         {popup.workHours}
-//         <br></br>
-//         <b>Park Tipi: </b>
-//         {popup.parkType}
-//         <br></br>
-//         <b>Ücretsiz Park Süresi: </b>
-//         {popup.freeTime}
-//         <br></br>
-//         <b>Longitude: </b>
-//         {popup.longitude}
-//         <br></br>
-//         <b>Latitude: </b>
-//         {popup.latitude}
-//         <br></br>
-//       </div>
-//       <div className="btn-group">
-//         <button
-//           disabled={isItemSaved}
-//           ref={saveButtonRef}
-//           className="btn-save"
-//           onClick={() => {
-//             setOpenMessage(true);
-//             handleSaveClick({
-//               id: popup.parkID,
-//               name: popup.parkName,
-//               capacity: popup.capacity,
-//               workHours: popup.workHours,
-//               parkType: popup.parkType,
-//               freeTime: popup.freeTime,
-//               longitude: popup.longitude,
-//               latitude: popup.latitude,
-//             });
-//             const newData2 = data2.features.push({
-//               type: "Feature",
-//               geometry: {
-//                 type: "Point",
-//                 coordinates: [popup.longitude, popup.latitude],
-//               },
-//               properties: {
-//                 id: popup.parkID,
-//                 name: popup.parkName,
-//                 capacity: popup.capacity,
-//                 workHours: popup.workHours,
-//                 parkType: popup.parkType,
-//                 freeTime: popup.freeTime,
-//                 longitude: popup.longitude,
-//                 latitude: popup.latitude,
-//               },
-//             });
-//             haritaVeriKaynaginiGuncelle(data2);
-//             console.log("data2 aldım verdim bu nedir?", popup);
-//           }}
-//         >
-//           Kaydet
-//         </button>
-
-//         <button
-//           className="btn-closee"
-//           onClick={() =>
-//             Panorama.OpenPanoramaOnLocation(popup.longitude, popup.latitude)
-//           }
-//         >
-//           Sokak Görüntüsü
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };

@@ -18,7 +18,7 @@
 .listItem {
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding:16px 8px 16px 8px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: small;
   border-bottom: 1px #cbc8c8 solid;
@@ -36,14 +36,13 @@
 }
 .subtitle {
   height: 20px;
-  color: var(--grayscale-off-black, #14142B);
+  color: var(--grayscale-off-black, #607080);
 
   font-feature-settings: "clig" off, "liga" off;
   font-size: 13px;
   font-style: normal;
   font-weight: 600;
   padding-right: 8px;
-
 }
 .values {
   color: #607080 !important;
@@ -53,27 +52,32 @@
   font-style: normal;
   font-weight: 400;
   height: 20px !important;
+
+  overflow: hidden; /* taşanları gizle */
+  white-space: nowrap; /* alt satıra hiç inme */
+  text-overflow: ellipsis;
+  align-items: center;
 }
 .rowitem {
   display: flex;
   flex-direction: row;
   margin-bottom: 8px;
   width: 240px;
-  overflow: hidden; /* taşanları gizle */
-    white-space: nowrap; /* alt satıra hiç inme */
-    text-overflow: ellipsis;
-    align-items: center;
+  /* overflow: hidden; 
+  white-space: nowrap; 
+  text-overflow: ellipsis;
+  align-items: center; */
+  margin-left: 12px;
 }
-.label-listbox{
+.label-listbox {
   color: #607080 !important;
-font-style: italic !important;
+  font-style: italic !important;
 
   font-feature-settings: "clig" off, "liga" off;
   font-size: 13px;
   font-style: normal;
   font-weight: 700;
   height: 20px !important;
-
 }
 /* .btn-hide{
   position: absolute;
@@ -83,3 +87,18 @@ font-style: italic !important;
 .btn-expand{
 
 } */
+.listItem-title{
+  font-size: 18px;
+  font-weight: 700;
+  color: black;
+  /* display: flex;
+  justify-content: flex-start; */
+  text-align: start;
+  margin-bottom: 16px;
+  /* width: 100px; */
+  overflow: hidden; /* taşanları gizle */
+  white-space: nowrap; 
+  text-overflow: ellipsis; /* eğer uzunsa üç nokta koy */
+
+
+}

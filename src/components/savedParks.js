@@ -13,11 +13,10 @@ export default function SavedParks({
   data22,
   setOpenMessage,
   setAcikpopup,
-acikpopup,
-panorama
+  acikpopup,
+  panorama,
 }) {
   const [isShown, setIsShown] = useState(true);
-
 
   const haritaVeriKaynaginiGuncelle = (veri) => {
     if (getclickMap) {
@@ -58,14 +57,10 @@ panorama
           longitude: updatedParks[i].longitude,
           latitude: updatedParks[i].latitude,
         },
-        
       });
-      console.log(data22, 'newdata2')
-      
-
+      console.log(data22, "newdata2");
     }
     getclickMap.getSource("savedparks")?.setData(data22);
-
   };
   const handleClicks = (event) => {
     setIsShown((current) => !current);
@@ -73,18 +68,18 @@ panorama
   // const getSources = () => {
   //   getclickMap.getSource("savedparks")?.setData(data22);
   // };
- 
 
   const [newcoordinates, setnewcoordinates] = useState([]);
 
   const handleClick = (elem) => {
-
-
     if (acikpopup) {
       acikpopup.remove();
     }
-    console.log("🚀 ~ file: listBox.js:12 ~ handleClick ~ elem:",elem.latitude );
-   
+    console.log(
+      "🚀 ~ file: listBox.js:12 ~ handleClick ~ elem:",
+      elem.latitude
+    );
+
     const popupDiv = document.createElement("div");
     reactDom.render(
       <PopupTest
@@ -97,50 +92,51 @@ panorama
       />,
       popupDiv
     );
-    const lat = elem.latitude
-    const lon = elem.longitude
-    console.log(elem, 'ne bu')
-    const coordinatess= [lon,lat];
-    setnewcoordinates(coordinatess)
-   
+    const lat = elem.latitude;
+    const lon = elem.longitude;
+    console.log(elem, "ne bu");
+    const coordinatess = [lon, lat];
+    setnewcoordinates(coordinatess);
 
     let popup = new maplibregl.Popup()
       .setLngLat(coordinatess)
       .setDOMContent(popupDiv)
       .addTo(getclickMap);
-      setAcikpopup(popup);
-      getclickMap.flyTo({
-        center: coordinatess,
-        zoom: 17,
-      });
-      getclickMap.on("zoomend", function () {
-        var currentZoom = getclickMap.getZoom();
+    setAcikpopup(popup);
+    getclickMap.flyTo({
+      center: coordinatess,
+      zoom: 17,
+    });
+    getclickMap.on("zoomend", function () {
+      var currentZoom = getclickMap.getZoom();
 
-        if (currentZoom <= 12) {
-          popup.remove(); // Pop-up'ı kapat
-        }
-      });
+      if (currentZoom <= 12) {
+        popup.remove(); // Pop-up'ı kapat
+      }
+    });
   };
   const panoramaFunc = () => {
-    panorama.HidePanoramaFrame()
-
-  }
+    panorama.HidePanoramaFrame();
+  };
   return (
     <>
       {isShown && (
         <div className="parksBox">
-          <div className="title"> Kaydettiklerim</div>
+          <div className="title"> Kaydettiklerim
           <div className="label-listbox">
             {savedParks.length} adet park kayıtlı.
-          </div>
+          </div></div>
+         
           <div className="content">
             {savedParks.length > 0 ? (
               savedParks.map((elem, index) => (
-                <div className="listItem" onClick={() => {handleClick(elem)  
-                  panoramaFunc()
-                  }                      
-               
-              }>
+                <div
+                  className="listItem"
+                  onClick={() => {
+                    handleClick(elem);
+                    panoramaFunc();
+                  }}
+                >
                   {"Park ID: " + elem.id}
                   <br></br>
                   {"Park Adı: " + elem.name}
@@ -166,12 +162,10 @@ panorama
                         setopen(true);
                         // setopenpanorama(true)
                         setid(elem.id);
-                        if(acikpopup){
+                        if (acikpopup) {
                           acikpopup.remove();
                         }
-                        panoramaFunc()
-
-                        
+                        panoramaFunc();
                       }}
                     >
                       Düzenle
@@ -180,15 +174,13 @@ panorama
                     <button
                       className="btn-closee btn-delete"
                       style={{ width: "100%", backgroundColor: "white" }}
-                      onClick={(e) => {clearItem(index);
-                        e.stopPropagation()
-                        if(acikpopup){
+                      onClick={(e) => {
+                        clearItem(index);
+                        e.stopPropagation();
+                        if (acikpopup) {
                           acikpopup.remove();
                         }
-                        
-                          
-                        }
-                      }
+                      }}
                     >
                       Sil
                     </button>
@@ -202,18 +194,20 @@ panorama
             )}
           </div>
           {savedParks.length > 0 && (
-            <button
-              className="btn-closee btn-all-clear"
-              onClick={() => {
-                allClear();
-                // getSources();
-                if(acikpopup){
-                  acikpopup.remove();
-                }
-              }}
-            >
-              Tümünü Temizle
-            </button>
+            <div className="savedparks-footer">
+              <button
+                className="btn-closee btn-all-clear"
+                onClick={() => {
+                  allClear();
+                  // getSources();
+                  if (acikpopup) {
+                    acikpopup.remove();
+                  }
+                }}
+              >
+                Tümünü Temizle
+              </button>
+            </div>
           )}
         </div>
       )}
@@ -234,7 +228,7 @@ const PopupTest = ({
   setOpenMessage,
   data22,
   haritaVeriKaynaginiGuncelle,
-  panorama
+  panorama,
 }) => {
   const savedItems = JSON.parse(localStorage.getItem("pushitems")) || [];
   const isItemSaved = savedItems.some((item) => item.id === popup.id);
@@ -325,7 +319,6 @@ const PopupTest = ({
               },
             });
             haritaVeriKaynaginiGuncelle(data22);
-
           }}
         >
           Kaydet
