@@ -1,14 +1,14 @@
 import React from "react";
 import "./message.css";
 
-export default function Message({closeMessage}) {
+export default function Message({closeMessage,messageText}) {
   return (
     <div className="message-container">
       <div className="message-background"></div>
 
       <div className="message-content">
-        <h2>Onay Mesajı</h2>
-        <h4 style={{ color: "green"}}>Kayıt başarıyla gerçekleşti!</h4>
+        <h1 style={{ color: "green"}}>Onay!</h1>
+        <h5 style={{ color: "black"}}>İşlem başarıyla gerçekleşti.</h5>
         <button className="btn-save" onClick={closeMessage}>Kapat</button>
       </div>
     </div>

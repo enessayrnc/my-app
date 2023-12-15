@@ -15,6 +15,8 @@ export default function SavedParks({
   setAcikpopup,
   acikpopup,
   panorama,
+  setopendelete,
+  setopenalldelete,
 }) {
   const [isShown, setIsShown] = useState(true);
 
@@ -24,52 +26,9 @@ export default function SavedParks({
     }
   };
 
-  const allClear = () => {
-    localStorage.setItem("pushitems", "[]");
-    setParks([]);
-    data22.features = [];
-
-    getclickMap.getSource("savedparks")?.setData(data22);
-  };
-
-  const clearItem = (index) => {
-    const updatedParks = [...savedParks];
-    updatedParks.splice(index, 1);
-    setParks(updatedParks);
-    localStorage.setItem("pushitems", JSON.stringify(updatedParks));
-    console.log(updatedParks, "updateparksssss");
-    data22.features = [];
-    for (var i = 0; i < updatedParks.length; i++) {
-      const newData2 = data22.features.push({
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [updatedParks[i].longitude, updatedParks[i].latitude],
-        },
-        properties: {
-          id: updatedParks[i].parkID,
-          name: updatedParks[i].parkName,
-          capacity: updatedParks[i].capacity,
-          name: updatedParks[i].parkName,
-          workHours: updatedParks[i].workHours,
-          parkType: updatedParks[i].parkType,
-          freeTime: updatedParks[i].freeTime,
-          longitude: updatedParks[i].longitude,
-          latitude: updatedParks[i].latitude,
-        },
-      });
-      console.log(data22, "newdata2");
-    }
-    getclickMap.getSource("savedparks")?.setData(data22);
-  };
   const handleClicks = (event) => {
     setIsShown((current) => !current);
   };
-  // const getSources = () => {
-  //   getclickMap.getSource("savedparks")?.setData(data22);
-  // };
-
-  const [newcoordinates, setnewcoordinates] = useState([]);
 
   const handleClick = (elem) => {
     if (acikpopup) {
@@ -96,7 +55,6 @@ export default function SavedParks({
     const lon = elem.longitude;
     console.log(elem, "ne bu");
     const coordinatess = [lon, lat];
-    setnewcoordinates(coordinatess);
 
     let popup = new maplibregl.Popup()
       .setLngLat(coordinatess)
@@ -122,22 +80,25 @@ export default function SavedParks({
     <>
       {isShown && (
         <div className="parksBox">
-          <div className="title"> Kaydettiklerim
-          <div className="label-listbox">
-            {savedParks.length} adet park kayıtlı.
-          </div></div>
-         
+          <div className="title">
+            {" "}
+            Kaydettiklerim
+            <div className="label-listbox">
+              {savedParks.length} adet park kayıtlı.
+            </div>
+          </div>
           <div className="content">
             {savedParks.length > 0 ? (
               savedParks.map((elem, index) => (
                 <div
                   className="listItem"
+                  style={{ alignItems: "start" }}
                   onClick={() => {
                     handleClick(elem);
                     panoramaFunc();
                   }}
                 >
-                  {"Park ID: " + elem.id}
+                  {/* {"Park ID: " + elem.id}
                   <br></br>
                   {"Park Adı: " + elem.name}
                   <br></br>
@@ -152,7 +113,40 @@ export default function SavedParks({
                   {"Boylam: " + elem.longitude}
                   <br></br>
                   {"Enlem: " + elem.latitude}
-                  <br></br>
+                  <br></br> */}
+                  <div>
+                    <b>{"Park ID: "}</b>
+                    {elem.id}
+                  </div>
+                  <div>
+                    {" "}
+                    <b>{"Park Adı: "}</b> {elem.name}
+                  </div>
+                  <div>
+                    {" "}
+                    <b>{"Kapasite: "}</b> {elem.capacity}
+                  </div>
+
+                  <div>
+                    {" "}
+                    <b>{"Çalışma Saatleri: "}</b> {elem.workHours}
+                  </div>
+
+                  <div>
+                    {" "}
+                    <b>{"Ücretsiz Park Süresi: "}</b> {elem.parkType}
+                  </div>
+
+                  <div>
+                    {" "}
+                    <b>{"Boylam: "}</b>{" "}
+                    {elem.longitude }
+                  </div>
+                  <div>
+                    {" "}
+                    <b>{"Enlem: "}</b>{" "}
+                    {elem.latitude }
+                  </div>
                   <div className="btn-group">
                     <button
                       className="btn-save"
@@ -175,8 +169,10 @@ export default function SavedParks({
                       className="btn-closee btn-delete"
                       style={{ width: "100%", backgroundColor: "white" }}
                       onClick={(e) => {
-                        clearItem(index);
+                        // clearItem(index);
                         e.stopPropagation();
+                        setopendelete(true);
+
                         if (acikpopup) {
                           acikpopup.remove();
                         }
@@ -188,18 +184,23 @@ export default function SavedParks({
                 </div>
               ))
             ) : (
-              <h5 className="no-records-message" style={{ color: "red" }}>
+              <h5
+                className="no-records-message"
+                style={{ color: "red", position: "absolute", top: "175px",  textAlign:"center" }}
+              >
                 Henüz bir park kaydetmediniz!
               </h5>
             )}
           </div>
-          {savedParks.length > 0 && (
-            <div className="savedparks-footer">
+          <div className="savedparks-footer">
+            {savedParks.length > 0 && (
               <button
                 className="btn-closee btn-all-clear"
                 onClick={() => {
-                  allClear();
+                  // allClear();
                   // getSources();
+                  setopenalldelete(true);
+
                   if (acikpopup) {
                     acikpopup.remove();
                   }
@@ -207,8 +208,8 @@ export default function SavedParks({
               >
                 Tümünü Temizle
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
 
@@ -216,7 +217,6 @@ export default function SavedParks({
         <button className="show-hide-button btn-save" onClick={handleClicks}>
           Kaydettiklerim ({savedParks.length})
         </button>
-        {/* <button>Genişlet</button> */}
       </div>
     </>
   );
@@ -281,10 +281,6 @@ const PopupTest = ({
         <br></br>
       </div>
       <div className="btn-group">
-        {/* EĞER açılan popup'ın id'si savedparksda(save) var ise disabled olarak gelmeli. */}
-        {/* { save.id
-          ? () : ()
-        }  */}
         <button
           disabled={isItemSaved}
           ref={saveButtonRef}

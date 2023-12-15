@@ -7,6 +7,10 @@ import Popup from "./components/popup";
 import PanoramaContainer from "./components/panoramacontainer";
 import Navbar from "./components/navbar";
 import Message from "./components/message";
+import Popupdelete from "./components/popupdelete";
+import Popupalldelete from "./components/popupalldelete";
+
+
 // import LayerManager from "./components/layermanager";
 
 
@@ -19,6 +23,10 @@ function App() {
   const [data22, setData22] = useState(false);
   const [acikpopup, setAcikpopup] = useState(false);
   const [panorama, setPanorama] = useState([]);
+  const [opendelete, setopendelete] = useState(false);
+  const [openalldelete, setopenalldelete] = useState(false);
+
+
 
 
 
@@ -62,16 +70,20 @@ function App() {
 
       ></ListBox>
       <SavedParks
-        setid={setId}
-        setopen={setOpen}
         savedParks={parks}
-        setParks={setParks}
         getclickMap={map}
         data22={data22}
+        acikpopup={acikpopup}
+        panorama = {panorama}
+        setid={setId}
+        setopen={setOpen}
+
+        setParks={setParks}
         setOpenMessage={setOpenMessage}
         setAcikpopup ={setAcikpopup}
-        acikpopup={acikpopup}
-                panorama = {panorama}
+        setopendelete={setopendelete}
+        setopenalldelete={setopenalldelete}
+
 
 
 
@@ -98,9 +110,48 @@ function App() {
           savedParks={parks}
           text="Düzenle!"
           closePopup={() => setOpen(false)}
+          // messageText="Kaydetme işleminiz başarıyla gerçekleşti."
+          // setmessageText={messageText}
+
         />
       ) : null}
-      {/* <LayerManager></LayerManager> */}
+      {opendelete ? (
+        <Popupdelete
+          setOpenMessage={setOpenMessage}
+          getclickMap={map}
+          data22={data22}
+
+          setParks={setParks}
+          id={id}
+          savedParks={parks}
+          text="Uyarı!"
+          closePopupDelete={() => setopendelete(false)}
+          // messageText="Seçili park, kaydedilenler arasından başarıyla silindi."
+          // setmessageText={messageText}
+
+        />
+      ) : null}
+      {openalldelete ? (
+        <Popupalldelete
+          setOpenMessage={setOpenMessage}
+          getclickMap={map}
+          data22={data22}
+
+          setParks={setParks}
+          id={id}
+          savedParks={parks}
+          text="Uyarı!"
+          closePopupAllDelete={() => setopenalldelete(false)}
+          // messageText="Seçili park, kaydedilenler arasından başarıyla silindi."
+          // setmessageText={messageText}
+          setid={setId}
+          setopen={setOpen}
+  
+          setAcikpopup ={setAcikpopup}
+          setopendelete={setopendelete}
+
+        />
+      ) : null}
     </div>
   );
 }

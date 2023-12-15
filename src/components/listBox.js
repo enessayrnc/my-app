@@ -11,7 +11,7 @@ export default function ListBox({
   data22,
   setAcikpopup,
   acikpopup,
-  panorama
+  panorama,
 }) {
   const haritaVeriKaynaginiGuncelle = (veri) => {
     if (getclickMap) {
@@ -32,10 +32,6 @@ export default function ListBox({
       zoom: 17,
     });
 
-    
-    
-      
-    
     const popupDiv = document.createElement("div");
     reactDom.render(
       <PopupTest
@@ -64,9 +60,8 @@ export default function ListBox({
     });
   };
   const panoramaFunc = () => {
-    panorama.HidePanoramaFrame()
-
-  }
+    panorama.HidePanoramaFrame();
+  };
 
   return (
     <div className="container">
@@ -80,9 +75,14 @@ export default function ListBox({
 
       {propsListbox.map((elem) => (
         <>
-          <div className="listItem" onClick={() => {handleClick(elem)
-          panoramaFunc()}}>
-                          <div className="listItem-title">{elem.properties.parkName}</div>
+          <div
+            className="listItem"
+            onClick={() => {
+              handleClick(elem);
+              panoramaFunc();
+            }}
+          >
+            <div className="listItem-title">{elem.properties.parkName}</div>
 
             <div className="rowitem">
               <div className="subtitle">Park ID: </div>
@@ -125,7 +125,7 @@ const PopupTest = ({
   data22,
   haritaVeriKaynaginiGuncelle,
   getclickMap,
-  panorama
+  panorama,
 }) => {
   const savedItems = JSON.parse(localStorage.getItem("pushitems")) || [];
   const isItemSaved = savedItems.some((item) => item.id === popup.parkID);

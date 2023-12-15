@@ -88,15 +88,24 @@ export default function Map(props) {
   useEffect(() => {
     if (!data) return; // harıtayı data olmadığında boş dönderir. İlk anda veri olmadığı için hataya düşmesini engelliyor.
     console.log("harita oluştu");
+    const maxBounds =  [
+      [27.56, 40.65], // Southwest coordinates
+    [30.18, 41.64], // Northeast coordinates
+    ]
+    
     const map = new maplibregl.Map({
+      
       //   container: mapContainer.current,
       container: "map",
-      style: "http://10.6.129.36/map/root_cbs.json",
+      // style: "http://10.6.129.36/map/root_cbs.json",
+      style:"https://cbstilesrv.ibb.gov.tr/rehber_altlik.json",
       // style:
       //   "https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json",
       center: [lng, lat],
       zoom: zoom,
       minZoom: 8.8,
+      maxBounds:maxBounds
+
     });
     props.clickMap(map);
     map.addControl(new maplibregl.NavigationControl());
@@ -107,6 +116,9 @@ export default function Map(props) {
       // console.log(props.panorama, 'lütfü')
       // Add an image to use as a custom marker
 
+      
+      
+    ;
       map.loadImage(images, (error, image) => {
         if (error) throw error;
         map.addImage("custom-marker", image);
@@ -159,23 +171,23 @@ export default function Map(props) {
         });
       });
 
-      map.setPaintProperty("yapi_layer", "fill-extrusion-height", [
+      map.setPaintProperty("yapi", "fill-extrusion-height", [
         "case",
         ["boolean", ["feature-state", "click"], false],
         ["get", "zemin_ustu_kat_sayisi"],
         0,
       ]);
     });
-
     const haritaVeriKaynaginiGuncelle = (veri) => {
       if (map) {
         map.getSource("savedparks")?.setData(veri);
       }
     };
-
+    
     //yükseklik değiştirme
     let clickENes = null;
     const changeHeight = (e) => {
+      console.log(map.getLayer('yapi'),"ihsan")
       console.log(clickENes);
       if (e.features.length > 0) {
         console.log(
@@ -208,7 +220,7 @@ export default function Map(props) {
     //yükseklikleri sıfırlama
     const clearHeight = (e) => {
       const clickPoint = map.queryRenderedFeatures(e.point);
-      if (clickPoint[0].layer.id !== "yapi_layer") {
+      if (clickPoint[0].layer.id !== "yapi") {
         console.log("adsbhfıcbdsıhvbj");
         if (clickENes) {
           map.setFeatureState(
@@ -220,8 +232,8 @@ export default function Map(props) {
       }
     };
 
-    map.on("click", "yapi_layer", changeHeight);
-    map.on("click", "yapi_layer", clearHeight);
+    map.on("click", "yapi", changeHeight);
+    map.on("click", "yapi", clearHeight);
 
     map.on("click", (e) => {
       let feature;
@@ -515,4 +527,6 @@ const PopupTest = ({
     </div>
   );
 };
+
+
 
